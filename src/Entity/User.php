@@ -104,20 +104,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[ORM\PrePersist]
-    public function aa(): void
-    {
-        $dateTimeNow = new DateTimeImmutable('now');
-        $this->setCreatedAt($dateTimeNow);
-    }
-
-    #[ORM\PreUpdate]
-    public function encryptPassword(): void
-    {
-        $dateTimeNow = new DateTimeImmutable('now');
-        $this->setUpdatedAt($dateTimeNow);
-    }
-
     /**
      * @see PasswordAuthenticatedUserInterface
      */
@@ -189,5 +175,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    #[ORM\PrePersist]
+    private function beforePersist(): void
+    {
+        $dateTimeNow = new DateTimeImmutable('now');
+        $this->setCreatedAt($dateTimeNow);
+    }
+
+    #[ORM\PreUpdate]
+    private function beforeUpdate(): void
+    {
+        $dateTimeNow = new DateTimeImmutable('now');
+        $this->setUpdatedAt($dateTimeNow);
     }
 }
