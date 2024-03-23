@@ -3,16 +3,19 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Service\UserService;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_USERNAME', fields: ['username'])]
 #[ORM\HasLifecycleCallbacks]
+#[UniqueEntity('username')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
@@ -20,7 +23,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 180)]
+    #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank]
     #[Groups(['user.register'])]
     private ?string $username = null;
@@ -102,16 +105,17 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
 
     #[ORM\PrePersist]
+    public function aa(): void
+    {
+        $dateTimeNow = new DateTimeImmutable('now');
+        $this->setCreatedAt($dateTimeNow);
+    }
+
     #[ORM\PreUpdate]
     public function encryptPassword(): void
     {
         $dateTimeNow = new DateTimeImmutable('now');
-
         $this->setUpdatedAt($dateTimeNow);
-
-        if ($this->getCreatedAt() === null) {
-            $this->setCreatedAt($dateTimeNow);
-        }
     }
 
     /**

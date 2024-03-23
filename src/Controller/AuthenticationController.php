@@ -5,15 +5,14 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
-class UserController extends AbstractController
+class AuthenticationController extends BaseController
 {
-    #[Route('/register', name: 'register_user', methods: 'POST')]
-//    #[IsGranted('ROLE_USER')]
+    #[Route('/register', name: 'register', methods: 'POST')]
     public function registerUser(
         #[MapRequestPayload(
             serializationContext: [
@@ -21,16 +20,17 @@ class UserController extends AbstractController
             ]
         )] User $user,
         EntityManagerInterface $em,
-        UserService $userService
+        UserService $userService,
     ): JsonResponse
     {
         $userService->encryptPassword($user);
         $userService->generateApiToken($user);
 
+
         $em->persist($user);
         $em->flush();
 
-        return $this->json($user, 200, [], [
+        return self::response($user, Response::HTTP_CREATED, [], [
             'groups' => ['user.token']
         ]);
     }
