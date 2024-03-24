@@ -26,7 +26,6 @@ class AuthenticationController extends BaseController
         $userService->encryptPassword($user);
         $userService->generateApiToken($user);
 
-
         $em->persist($user);
         $em->flush();
 
