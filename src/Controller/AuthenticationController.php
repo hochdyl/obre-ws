@@ -30,7 +30,7 @@ class AuthenticationController extends BaseController
         $em->flush();
 
         return self::response($user, Response::HTTP_CREATED, [], [
-            'groups' => ['user.token']
+            'groups' => ['user']
         ]);
     }
 }

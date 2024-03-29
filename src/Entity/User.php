@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank]
-    #[Groups(['user.register'])]
+    #[Groups(['user.register', 'user'])]
     private ?string $username = null;
 
     /**
@@ -43,7 +43,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Unique]
-    #[Groups(['user.token'])]
+    #[Groups(['user', 'user.token'])]
     private ?string $apiToken = null;
 
     #[ORM\Column]
