@@ -12,6 +12,14 @@ use Symfony\Component\Routing\Attribute\Route;
 
 class AuthenticationController extends BaseController
 {
+    #[Route('/self', name: 'self', methods: 'GET')]
+    public function self(): JsonResponse
+    {
+        return self::response($this->getUser(), Response::HTTP_OK, [], [
+            'groups' => ['user']
+        ]);
+    }
+
     #[Route('/register', name: 'register', methods: 'POST')]
     public function registerUser(
         #[MapRequestPayload(
