@@ -12,13 +12,17 @@ readonly class UserService
 
     public function encryptPassword(User $user): User
     {
-        $plaintextPassword = $user->getPassword();
-        $hashedPassword = $this->passwordHasher->hashPassword($user, $plaintextPassword);
+        $plainPassword = $user->getPassword();
+        $hashedPassword = $this->passwordHasher->hashPassword($user, $plainPassword);
         return $user->setPassword($hashedPassword);
     }
 
     public function generateApiToken(User $user): User
     {
         return $user->setApiToken(Uuid::v1());
+    }
+
+    public function isPasswordValid(User $user, string $plainPassword): bool {
+         return $this->passwordHasher->isPasswordValid($user, $plainPassword);
     }
 }
