@@ -42,9 +42,9 @@ class AuthenticationController extends BaseController
             serializationContext: [
                 'groups' => ['user.register']
             ]
-        )] User $user,
+        )] User                $user,
         EntityManagerInterface $em,
-        UserService $userService,
+        UserService            $userService,
     ): JsonResponse
     {
         $userService->encryptPassword($user);
@@ -66,14 +66,14 @@ class AuthenticationController extends BaseController
     #[Route('/login', name: 'login', methods: 'POST')]
     public function login(
         #[MapRequestPayload] LoginDTO $loginDTO,
-        EntityManagerInterface $em,
-        UserRepository $userRepository,
-        UserService $userService
+        EntityManagerInterface        $em,
+        UserRepository                $userRepository,
+        UserService                   $userService
     ): JsonResponse
     {
         $storedUser = $userRepository->findOneBy(['username' => $loginDTO->username]);
 
-        if(!$storedUser || !$userService->isPasswordValid($storedUser, $loginDTO->password)) {
+        if (!$storedUser || !$userService->isPasswordValid($storedUser, $loginDTO->password)) {
             throw new Exception("Invalid credentials", Response::HTTP_UNAUTHORIZED);
         }
 

@@ -15,7 +15,7 @@ abstract class BaseController extends AbstractController
      */
     protected function response(
         mixed $data,
-        int $status = Response::HTTP_OK,
+        int   $status = Response::HTTP_OK,
         array $headers = [],
         array $context = []
     ): JsonResponse
