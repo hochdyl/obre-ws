@@ -15,9 +15,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 class ApiTokenAuthenticator extends AbstractAuthenticator
 {
 
-    public function supports(Request $request): ?bool
+    public function supports(Request $request): true
     {
-        return $request->headers->has('Authorization') && str_contains($request->headers->get('Authorization'), 'Bearer ');
+        return true;
     }
 
     public function authenticate(Request $request): Passport

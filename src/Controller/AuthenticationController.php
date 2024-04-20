@@ -73,11 +73,8 @@ class AuthenticationController extends BaseController
     {
         $storedUser = $userRepository->findOneBy(['username' => $loginDTO->username]);
 
-        if(!$storedUser) {
-            throw new Exception("User not found");
-        }
-        if(!$userService->isPasswordValid($storedUser, $loginDTO->password)) {
-            throw new Exception("Invalid credentials");
+        if(!$storedUser || !$userService->isPasswordValid($storedUser, $loginDTO->password)) {
+            throw new Exception("Invalid credentials", Response::HTTP_UNAUTHORIZED);
         }
 
         $userService->generateApiToken($storedUser);

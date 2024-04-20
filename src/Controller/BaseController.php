@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 abstract class BaseController extends AbstractController
 {
     /*
-     * JSend standard response
+     * JSend format response
      *
      * @see https://github.com/omniti-labs/jsend
      */

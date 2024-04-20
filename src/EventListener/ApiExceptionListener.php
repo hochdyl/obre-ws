@@ -13,17 +13,16 @@ use Symfony\Component\Validator\Exception\ValidationFailedException;
 final class ApiExceptionListener
 {
     /*
-     * JSend standard response
+     * JSend format response
      *
      * @see https://github.com/omniti-labs/jsend
      */
-    public const HTTP_CREATED = 201;
-
     #[AsEventListener(event: KernelEvents::EXCEPTION)]
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
 
+        $code = $exception->getCode() >= 300 ? $exception->getCode() : 500;
         $status = 'error';
         $type = 'message';
         $value = $exception->getMessage();
@@ -33,6 +32,7 @@ final class ApiExceptionListener
 
         // Check if exception come from RequestPayloadValueResolver
         if ($filename === pathinfo(RequestPayloadValueResolver::class)['filename']) {
+            $code = 400;
             $value = 'Request body is missing or improperly formatted';
 
             // Check if exception come from ValidationFailedException
@@ -49,7 +49,7 @@ final class ApiExceptionListener
         $response = new JsonResponse([
             'status' => $status,
             $type => $value
-        ]);
+        ], $code);
 
         $event->setResponse($response);
     }
