@@ -3,21 +3,21 @@
 namespace App\EventListener;
 
 use App\Service\ValidationService;
-use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
+use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
-final class ApiExceptionListener
+#[AsDoctrineListener(event: KernelEvents::EXCEPTION)]
+final class ExceptionListener
 {
     /*
      * JSend format response
      *
      * @see https://github.com/omniti-labs/jsend
      */
-    #[AsEventListener(event: KernelEvents::EXCEPTION)]
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();

@@ -4,11 +4,14 @@ namespace App\Entity;
 
 use App\Repository\UserRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
@@ -51,6 +54,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private ?DateTimeImmutable $updatedAt = null;
+
+    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'owner')]
+    private Collection $games;
+
+    public function __construct()
+    {
+        $this->games = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -139,19 +150,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[ORM\PrePersist]
-    #[ORM\PreUpdate]
-    public function updatedTimestamps(): void
-    {
-        $dateTimeNow = new DateTimeImmutable('now');
-
-        $this->setUpdatedAt($dateTimeNow);
-
-        if ($this->getCreatedAt() === null) {
-            $this->setCreatedAt($dateTimeNow);
-        }
-    }
-
     public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
@@ -176,17 +174,40 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    #[ORM\PrePersist]
-    private function beforePersist(): void
+    public function generateApiToken(): User
     {
-        $dateTimeNow = new DateTimeImmutable('now');
-        $this->setCreatedAt($dateTimeNow);
+        $this->setApiToken(Uuid::v1());
+
+        return $this;
     }
 
-    #[ORM\PreUpdate]
-    private function beforeUpdate(): void
+    /**
+     * @return Collection<int, Game>
+     */
+    public function getGames(): Collection
     {
-        $dateTimeNow = new DateTimeImmutable('now');
-        $this->setUpdatedAt($dateTimeNow);
+        return $this->games;
+    }
+
+    public function addGame(Game $game): static
+    {
+        if (!$this->games->contains($game)) {
+            $this->games->add($game);
+            $game->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGame(Game $game): static
+    {
+        if ($this->games->removeElement($game)) {
+            // set the owning side to null (unless already changed)
+            if ($game->getOwner() === $this) {
+                $game->setOwner(null);
+            }
+        }
+
+        return $this;
     }
 }

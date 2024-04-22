@@ -5,7 +5,7 @@ namespace App\Controller;
 use App\Dto\Authentication\LoginDTO;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use App\Service\UserService;
+use App\Service\UserPasswordService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -33,7 +33,7 @@ class AuthenticationController extends BaseController
      *
      * @param User $user
      * @param EntityManagerInterface $em
-     * @param UserService $userService
+     * @param UserPasswordService $userService
      * @return JsonResponse
      */
     #[Route('/register', name: 'register', methods: 'POST')]
@@ -44,11 +44,11 @@ class AuthenticationController extends BaseController
             ]
         )] User                $user,
         EntityManagerInterface $em,
-        UserService            $userService,
+        UserPasswordService    $userService,
     ): JsonResponse
     {
         $userService->encryptPassword($user);
-        $userService->generateApiToken($user);
+        $user->generateApiToken();
 
         $em->persist($user);
         $em->flush();
@@ -68,7 +68,7 @@ class AuthenticationController extends BaseController
         #[MapRequestPayload] LoginDTO $loginDTO,
         EntityManagerInterface        $em,
         UserRepository                $userRepository,
-        UserService                   $userService
+        UserPasswordService $userService
     ): JsonResponse
     {
         $storedUser = $userRepository->findOneBy(['username' => $loginDTO->username]);
@@ -77,7 +77,7 @@ class AuthenticationController extends BaseController
             throw new Exception("Invalid credentials", Response::HTTP_UNAUTHORIZED);
         }
 
-        $userService->generateApiToken($storedUser);
+        $storedUser->generateApiToken();
 
         $em->persist($storedUser);
         $em->flush();

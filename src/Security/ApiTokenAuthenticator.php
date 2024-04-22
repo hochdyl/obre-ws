@@ -14,7 +14,6 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 
 class ApiTokenAuthenticator extends AbstractAuthenticator
 {
-
     public function supports(Request $request): true
     {
         return true;
