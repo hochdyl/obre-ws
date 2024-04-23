@@ -4,13 +4,14 @@ namespace App\EventListener;
 
 use App\Service\ValidationService;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
+use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
-#[AsDoctrineListener(event: KernelEvents::EXCEPTION)]
+#[AsEventListener(event: KernelEvents::EXCEPTION)]
 final class ExceptionListener
 {
     /*
@@ -21,6 +22,8 @@ final class ExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
+
+//        dd($exception);
 
         $code = $exception->getCode() >= 300 ? $exception->getCode() : 500;
         $status = 'error';

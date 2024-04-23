@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Dto\Authentication;
+namespace App\DTO\Authentication;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class LoginDTO
+class LoginUserDTO
 {
     public function __construct(
         #[Assert\NotBlank]

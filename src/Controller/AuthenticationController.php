@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 
-use App\Dto\Authentication\LoginDTO;
+use App\DTO\Authentication\LoginUserDTO;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\UserPasswordService;
@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
+#[Route('/authentication', name: 'authentication')]
 class AuthenticationController extends BaseController
 {
     /**
@@ -20,7 +21,7 @@ class AuthenticationController extends BaseController
      *
      * @return JsonResponse
      */
-    #[Route('/self', name: 'self', methods: 'GET')]
+    #[Route(name: 'self', methods: 'GET')]
     public function self(): JsonResponse
     {
         return self::response($this->getUser(), Response::HTTP_OK, [], [
@@ -33,7 +34,7 @@ class AuthenticationController extends BaseController
      *
      * @param User $user
      * @param EntityManagerInterface $em
-     * @param UserPasswordService $userService
+     * @param UserPasswordService $userPasswordService
      * @return JsonResponse
      */
     #[Route('/register', name: 'register', methods: 'POST')]
@@ -44,10 +45,10 @@ class AuthenticationController extends BaseController
             ]
         )] User                $user,
         EntityManagerInterface $em,
-        UserPasswordService    $userService,
+        UserPasswordService    $userPasswordService,
     ): JsonResponse
     {
-        $userService->encryptPassword($user);
+        $userPasswordService->encryptPassword($user);
         $user->generateApiToken();
 
         $em->persist($user);
@@ -65,15 +66,15 @@ class AuthenticationController extends BaseController
      */
     #[Route('/login', name: 'login', methods: 'POST')]
     public function login(
-        #[MapRequestPayload] LoginDTO $loginDTO,
-        EntityManagerInterface        $em,
-        UserRepository                $userRepository,
-        UserPasswordService $userService
+        #[MapRequestPayload] LoginUserDTO $loginUserDTO,
+        EntityManagerInterface            $em,
+        UserRepository                    $userRepository,
+        UserPasswordService               $userPasswordService
     ): JsonResponse
     {
-        $storedUser = $userRepository->findOneBy(['username' => $loginDTO->username]);
+        $storedUser = $userRepository->findOneBy(['username' => $loginUserDTO->username]);
 
-        if (!$storedUser || !$userService->isPasswordValid($storedUser, $loginDTO->password)) {
+        if (!$storedUser || !$userPasswordService->isPasswordValid($storedUser, $loginUserDTO->password)) {
             throw new Exception("Invalid credentials", Response::HTTP_UNAUTHORIZED);
         }
 
