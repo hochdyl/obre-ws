@@ -3,6 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Game;
+use App\Repository\GameRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -12,13 +13,23 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/games', name: 'games')]
 class GameController extends BaseController
 {
-    #[Route(name: 'get', methods: 'GET')]
-    public function get(): JsonResponse
+    #[Route(name: 'getAll', methods: 'GET')]
+    public function getAll(GameRepository $gameRepository): JsonResponse
     {
-        // TODO: get games or game with {id}
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/GameController.php',
+        $games = $gameRepository->findAll();
+
+        return self::response($games, Response::HTTP_OK, [], [
+            'groups' => ['game']
+        ]);
+    }
+
+    #[Route('/{id}', name: 'get', methods: 'GET')]
+    public function get(int $id, GameRepository $gameRepository): JsonResponse
+    {
+        $game = $gameRepository->find($id);
+
+        return self::response($game, Response::HTTP_OK, [], [
+            'groups' => ['game']
         ]);
     }
 
