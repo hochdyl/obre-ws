@@ -13,16 +13,29 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/games', name: 'games')]
 class GameController extends BaseController
 {
+    /**
+     * Return all games with the newest first
+     *
+     * @param GameRepository $gameRepository
+     * @return JsonResponse
+     */
     #[Route(name: 'getAll', methods: 'GET')]
     public function getAll(GameRepository $gameRepository): JsonResponse
     {
-        $games = $gameRepository->findAll();
+        $games = $gameRepository->findBy([], ['id' => 'DESC']);
 
         return self::response($games, Response::HTTP_OK, [], [
             'groups' => ['game']
         ]);
     }
 
+    /**
+     * Return a game by id
+     *
+     * @param int $id
+     * @param GameRepository $gameRepository
+     * @return JsonResponse
+     */
     #[Route('/{id}', name: 'get', methods: 'GET')]
     public function get(int $id, GameRepository $gameRepository): JsonResponse
     {
@@ -33,6 +46,13 @@ class GameController extends BaseController
         ]);
     }
 
+    /**
+     * Create a new game
+     *
+     * @param Game $game
+     * @param EntityManagerInterface $em
+     * @return JsonResponse
+     */
     #[Route(name: 'create', methods: 'POST')]
     public function create(
         #[MapRequestPayload(
