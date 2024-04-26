@@ -8,7 +8,7 @@ security:
         user_provider:
             entity:
                 class: App\Entity\User
-                property: apiToken
+                property: sessionToken
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
@@ -16,7 +16,7 @@ security:
         main:
             pattern: ^/(?!authentication/login$|authentication/register$).*
             provider: user_provider
-            custom_authenticator: App\Security\ApiTokenAuthenticator
+            custom_authenticator: App\Security\SessionTokenAuthenticator
             stateless: true
             lazy: true
 

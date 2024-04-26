@@ -17,19 +17,6 @@ use Symfony\Component\Routing\Attribute\Route;
 class AuthenticationController extends BaseController
 {
     /**
-     * Return a user from current session
-     *
-     * @return JsonResponse
-     */
-    #[Route(name: 'self', methods: 'GET')]
-    public function self(): JsonResponse
-    {
-        return self::response($this->getUser(), Response::HTTP_OK, [], [
-            'groups' => ['user']
-        ]);
-    }
-
-    /**
      * Register a new user
      *
      * @param User $user
@@ -49,7 +36,7 @@ class AuthenticationController extends BaseController
     ): JsonResponse
     {
         $userPasswordService->encryptPassword($user);
-        $user->generateApiToken();
+        $user->generateSessionToken();
 
         $em->persist($user);
         $em->flush();
@@ -78,7 +65,7 @@ class AuthenticationController extends BaseController
             throw new Exception("Invalid credentials", Response::HTTP_UNAUTHORIZED);
         }
 
-        $storedUser->generateApiToken();
+        $storedUser->generateSessionToken();
 
         $em->persist($storedUser);
         $em->flush();

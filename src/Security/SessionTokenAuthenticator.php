@@ -12,7 +12,7 @@ use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPasspor
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 
-class ApiTokenAuthenticator extends AbstractAuthenticator
+class SessionTokenAuthenticator extends AbstractAuthenticator
 {
     public function supports(Request $request): true
     {

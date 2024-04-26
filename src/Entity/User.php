@@ -47,7 +47,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Unique]
     #[Groups(['user'])]
-    private ?string $apiToken = null;
+    private ?string $sessionToken = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
@@ -138,14 +138,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         // $this->plainPassword = null;
     }
 
-    public function getApiToken(): ?string
+    public function getSessionToken(): ?string
     {
-        return $this->apiToken;
+        return $this->sessionToken;
     }
 
-    public function setApiToken(?string $apiToken): static
+    public function setSessionToken(?string $sessionToken): static
     {
-        $this->apiToken = $apiToken;
+        $this->sessionToken = $sessionToken;
 
         return $this;
     }
@@ -174,9 +174,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function generateApiToken(): User
+    public function generateSessionToken(): User
     {
-        $this->setApiToken(Uuid::v1());
+        $this->setSessionToken(Uuid::v1());
 
         return $this;
     }
