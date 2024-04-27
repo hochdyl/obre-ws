@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\Game;
+use App\Service\SluggerService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -19,6 +20,24 @@ class GameRepository extends ServiceEntityRepository
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Game::class);
+    }
+
+    public function findByWithCleanedSlug(array $criteria)
+    {
+        $queryBuilder = $this->createQueryBuilder('g');
+
+        foreach ($criteria as $key => $value) {
+            if ($key === 'title') {
+                $key = 'slug';
+                $value = SluggerService::getSlug($value);
+            }
+
+            $queryBuilder
+                ->andWhere("g.$key = :$key")
+                ->setParameter($key, $value);
+        }
+
+        return $queryBuilder->getQuery()->getResult();
     }
 
     //    /**

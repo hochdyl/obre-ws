@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\Entity\Game;
 use App\Repository\GameRepository;
+use App\Service\SluggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -64,7 +65,11 @@ class GameController extends BaseController
     ): JsonResponse
     {
         $user = $this->getUser();
-        $game->setOwner($user);
+        $slug = SluggerService::getSlug($game->getTitle());
+
+        $game
+            ->setSlug($slug)
+            ->setOwner($user);
 
         $em->persist($game);
         $em->flush();

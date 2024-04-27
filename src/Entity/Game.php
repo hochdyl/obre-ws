@@ -8,10 +8,11 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Regex;
 
 #[ORM\Entity(repositoryClass: GameRepository::class)]
-#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_TITLE', fields: ['title'])]
-#[UniqueEntity('title')]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_SLUG', fields: ['slug'])]
+#[UniqueEntity('title', repositoryMethod: 'findByWithCleanedSlug')]
 class Game
 {
     #[ORM\Id]
@@ -34,16 +35,24 @@ class Game
     private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column()]
-    #[Assert\Type(
-        type: '\DateTimeInterface',
-        message: 'The value {{ value }} is not a valid {{ type }}.',
-    )]
+    #[Assert\NotBlank]
     #[Groups(['game', 'game.create'])]
     private ?DateTimeImmutable $startedAt = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
+    #[Regex(
+        pattern: '/^[a-zA-Z0-9\- ]+$/',
+        message: 'Title contains wrong characters',
+        match: true
+
+    )]
     #[Groups(['game', 'game.create'])]
     private ?string $title = null;
+
+    #[ORM\Column(length: 255)]
+    #[Groups(['game'])]
+    private ?string $slug = null;
 
     public function getId(): ?int
     {
@@ -120,6 +129,18 @@ class Game
     public function setTitle(string $title): static
     {
         $this->title = $title;
+
+        return $this;
+    }
+
+    public function getSlug(): ?string
+    {
+        return $this->slug;
+    }
+
+    public function setSlug(string $slug): static
+    {
+        $this->slug = $slug;
 
         return $this;
     }

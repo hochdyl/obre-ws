@@ -6,10 +6,13 @@ use App\Repository\AppVersionRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints\Regex;
 
 #[ORM\Entity(repositoryClass: AppVersionRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_VERSION', fields: ['name', 'number'])]
+#[UniqueEntity(['name', 'number'])]
 class AppVersion
 {
     #[ORM\Id]

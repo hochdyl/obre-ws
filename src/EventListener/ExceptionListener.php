@@ -22,10 +22,9 @@ final class ExceptionListener
     public function onKernelException(ExceptionEvent $event): void
     {
         $exception = $event->getThrowable();
+        $exceptionCode = $exception->getCode();
 
-//        dd($exception);
-
-        $code = $exception->getCode() >= 300 ? $exception->getCode() : 500;
+        $code = $exceptionCode >= 300 && $exceptionCode < 600 ? $exception->getCode() : 500;
         $status = 'error';
         $type = 'message';
         $value = $exception->getMessage();

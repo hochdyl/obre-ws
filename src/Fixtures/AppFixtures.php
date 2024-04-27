@@ -13,12 +13,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class AppFixtures extends Fixture
 {
-    private $userPasswordService;
-
-    public function __construct(UserPasswordService $userPasswordService)
-    {
-        $this->userPasswordService = $userPasswordService;
-    }
+    public function __construct(private readonly UserPasswordService $userPasswordService){}
 
     public function load(ObjectManager $manager): void
     {
@@ -41,6 +36,7 @@ class AppFixtures extends Fixture
         $game = new Game();
         $game
             ->setTitle("Fixture game")
+            ->setSlug('fixture-game')
             ->setStartedAt(new DateTimeImmutable())
             ->setOwner($user);
 
