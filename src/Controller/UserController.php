@@ -15,7 +15,7 @@ class UserController extends BaseController
      *
      * @return JsonResponse
      */
-    #[Route(name: 'self', methods: 'GET')]
+    #[Route('/self', name: 'self', methods: 'GET')]
     public function self(): JsonResponse
     {
         return self::response($this->getUser(), Response::HTTP_OK, [], [
