@@ -22,24 +22,6 @@ class GameRepository extends ServiceEntityRepository
         parent::__construct($registry, Game::class);
     }
 
-    public function findByWithCleanedSlug(array $criteria)
-    {
-        $queryBuilder = $this->createQueryBuilder('g');
-
-        foreach ($criteria as $key => $value) {
-            if ($key === 'title') {
-                $key = 'slug';
-                $value = SluggerService::getSlug($value);
-            }
-
-            $queryBuilder
-                ->andWhere("g.$key = :$key")
-                ->setParameter($key, $value);
-        }
-
-        return $queryBuilder->getQuery()->getResult();
-    }
-
     //    /**
     //     * @return Game[] Returns an array of Game objects
     //     */

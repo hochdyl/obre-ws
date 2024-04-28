@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints\Regex;
 
 #[ORM\Entity(repositoryClass: GameRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_SLUG', fields: ['slug'])]
-#[UniqueEntity('title', repositoryMethod: 'findByWithCleanedSlug')]
+#[UniqueEntity('slug')]
 class Game
 {
     #[ORM\Id]
@@ -51,7 +51,7 @@ class Game
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['game'])]
+    #[Groups(['game', 'game.create'])]
     private ?string $slug = null;
 
     public function getId(): ?int

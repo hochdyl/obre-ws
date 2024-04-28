@@ -6,6 +6,7 @@ use App\Entity\Game;
 use App\Repository\GameRepository;
 use App\Service\SluggerService;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -53,6 +54,7 @@ class GameController extends BaseController
      * @param Game $game
      * @param EntityManagerInterface $em
      * @return JsonResponse
+     * @throws Exception
      */
     #[Route(name: 'create', methods: 'POST')]
     public function create(
@@ -64,12 +66,15 @@ class GameController extends BaseController
         EntityManagerInterface $em,
     ): JsonResponse
     {
-        $user = $this->getUser();
         $slug = SluggerService::getSlug($game->getTitle());
 
-        $game
-            ->setSlug($slug)
-            ->setOwner($user);
+        if ($slug !== $game->getSlug()) {
+            throw new Exception('Slug does not match with title');
+        }
+
+        $user = $this->getUser();
+
+        $game->setOwner($user);
 
         $em->persist($game);
         $em->flush();
