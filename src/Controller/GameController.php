@@ -32,16 +32,16 @@ class GameController extends BaseController
     }
 
     /**
-     * Return a game by id
+     * Return a game by slug
      *
-     * @param int $id
+     * @param string $slug
      * @param GameRepository $gameRepository
      * @return JsonResponse
      */
-    #[Route('/{id}', name: 'get', methods: 'GET')]
-    public function get(int $id, GameRepository $gameRepository): JsonResponse
+    #[Route('/{slug}', name: 'get', methods: 'GET')]
+    public function get(string $slug, GameRepository $gameRepository): JsonResponse
     {
-        $game = $gameRepository->find($id);
+        $game = $gameRepository->findOneBy(['slug' => $slug]);
 
         return self::response($game, Response::HTTP_OK, [], [
             'groups' => ['game']

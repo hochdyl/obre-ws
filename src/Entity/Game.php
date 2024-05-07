@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\GameRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -54,6 +56,14 @@ class Game
     #[Groups(['game', 'game.create'])]
     private ?string $slug = null;
 
+    #[ORM\OneToMany(targetEntity: Protagonist::class, mappedBy: 'game')]
+    private Collection $protagonists;
+
+    public function __construct()
+    {
+        $this->protagonists = new ArrayCollection();
+    }
+
     public function getId(): ?int
     {
         return $this->id;
@@ -86,20 +96,6 @@ class Game
     public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
-    }
-
-    #[ORM\PrePersist]
-    private function beforePersist(): void
-    {
-        $dateTimeNow = new DateTimeImmutable('now');
-        $this->setCreatedAt($dateTimeNow);
-    }
-
-    #[ORM\PreUpdate]
-    private function beforeUpdate(): void
-    {
-        $dateTimeNow = new DateTimeImmutable('now');
-        $this->setUpdatedAt($dateTimeNow);
     }
 
     public function setUpdatedAt(DateTimeImmutable $updatedAt): static
@@ -141,6 +137,36 @@ class Game
     public function setSlug(string $slug): static
     {
         $this->slug = $slug;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Protagonist>
+     */
+    public function getProtagonists(): Collection
+    {
+        return $this->protagonists;
+    }
+
+    public function addProtagonist(Protagonist $protagonist): static
+    {
+        if (!$this->protagonists->contains($protagonist)) {
+            $this->protagonists->add($protagonist);
+            $protagonist->setGame($this);
+        }
+
+        return $this;
+    }
+
+    public function removeProtagonist(Protagonist $protagonist): static
+    {
+        if ($this->protagonists->removeElement($protagonist)) {
+            // set the owning side to null (unless already changed)
+            if ($protagonist->getGame() === $this) {
+                $protagonist->setGame(null);
+            }
+        }
 
         return $this;
     }

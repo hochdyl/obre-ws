@@ -22,12 +22,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user', 'game'])]
+    #[Groups(['user', 'game', 'protagonist'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank]
-    #[Groups(['user.register', 'user', 'game'])]
+    #[Groups(['user.register', 'user', 'game', 'protagonist'])]
     private ?string $username = null;
 
     /**
