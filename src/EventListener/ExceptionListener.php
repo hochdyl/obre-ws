@@ -21,6 +21,8 @@ final class ExceptionListener
      */
     public function onKernelException(ExceptionEvent $event): void
     {
+        if ($_ENV['APP_ENV'] !== 'prod') return;
+
         $exception = $event->getThrowable();
         $exceptionCode = $exception->getCode();
 

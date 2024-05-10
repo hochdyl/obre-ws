@@ -9,6 +9,7 @@ class LoginUserDTO
     public function __construct(
         #[Assert\NotBlank]
         public string $username,
+
         #[Assert\NotBlank]
         public string $password,
     ) {}

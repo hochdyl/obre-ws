@@ -53,15 +53,15 @@ class AuthenticationController extends BaseController
      */
     #[Route('/login', name: 'login', methods: 'POST')]
     public function login(
-        #[MapRequestPayload] LoginUserDTO $loginUserDTO,
+        #[MapRequestPayload] LoginUserDTO $loginDTO,
         EntityManagerInterface            $em,
         UserRepository                    $userRepository,
         UserPasswordService               $userPasswordService
     ): JsonResponse
     {
-        $storedUser = $userRepository->findOneBy(['username' => $loginUserDTO->username]);
+        $storedUser = $userRepository->findOneBy(['username' => $loginDTO->username]);
 
-        if (!$storedUser || !$userPasswordService->isPasswordValid($storedUser, $loginUserDTO->password)) {
+        if (!$storedUser || !$userPasswordService->isPasswordValid($storedUser, $loginDTO->password)) {
             throw new Exception("Invalid credentials", Response::HTTP_UNAUTHORIZED);
         }
 

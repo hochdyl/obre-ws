@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\Protagonist\CreateProtagonistDTO;
 use App\Entity\Protagonist;
 use App\Repository\GameRepository;
 use App\Service\SluggerService;
@@ -22,8 +23,8 @@ class ProtagonistController extends BaseController
      * @param GameRepository $gameRepository
      * @return JsonResponse
      */
-    #[Route(name: 'getProtagonists', methods: 'GET')]
-    public function getProtagonists(string $gameSlug, GameRepository $gameRepository): JsonResponse
+    #[Route(name: 'getAllByGame', methods: 'GET')]
+    public function getAllByGame(string $gameSlug, GameRepository $gameRepository): JsonResponse
     {
         $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
         $protagonists = $game->getProtagonists();
@@ -37,7 +38,7 @@ class ProtagonistController extends BaseController
      * Create a new game protagonist
      *
      * @param string $gameSlug
-     * @param Protagonist $protagonist
+     * @param CreateProtagonistDTO $protagonistDTO
      * @param GameRepository $gameRepository
      * @param EntityManagerInterface $em
      * @return JsonResponse
@@ -46,20 +47,18 @@ class ProtagonistController extends BaseController
     #[Route(name: 'create', methods: 'POST')]
     public function create(
         string $gameSlug,
-        #[MapRequestPayload(
-            serializationContext: [
-                'groups' => ['protagonist.create']
-            ]
-        )] Protagonist $protagonist,
+        #[MapRequestPayload] CreateProtagonistDTO $protagonistDTO,
         GameRepository $gameRepository,
         EntityManagerInterface $em,
     ): JsonResponse
     {
-        $slug = SluggerService::getSlug($protagonist->getSlug());
+        $slug = SluggerService::getSlug($protagonistDTO->name);
 
-        if ($slug !== $protagonist->getSlug()) {
+        if ($slug !== $protagonistDTO->slug) {
             throw new Exception('Slug does not match with name');
         }
+
+        dd($protagonistDTO);
 
         $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
         $protagonist->setGame($game);

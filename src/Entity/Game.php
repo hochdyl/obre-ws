@@ -53,6 +53,12 @@ class Game
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Regex(
+        pattern: '/^[a-zA-Z0-9\- ]+$/',
+        message: 'Slug contains wrong characters',
+        match: true
+
+    )]
     #[Groups(['game', 'game.create'])]
     private ?string $slug = null;
 

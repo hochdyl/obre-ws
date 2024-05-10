@@ -6,11 +6,15 @@ use App\Repository\ProtagonistRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Regex;
+use Vich\UploaderBundle\Mapping\Annotation\Uploadable;
+use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
 
 #[ORM\Entity(repositoryClass: ProtagonistRepository::class)]
+#[Uploadable]
 class Protagonist
 {
     #[ORM\Id]
@@ -31,6 +35,12 @@ class Protagonist
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Regex(
+        pattern: '/^[a-zA-Z0-9\- ]+$/',
+        message: 'Slug contains wrong characters',
+        match: true
+
+    )]
     #[Groups(['protagonist', 'protagonist.create'])]
     private ?string $slug = null;
 
@@ -56,6 +66,10 @@ class Protagonist
     #[Assert\Url]
     #[Groups(['protagonist', 'protagonist.create'])]
     private ?string $portrait = null;
+
+    #[UploadableField(mapping: 'protagonist', fileNameProperty: 'portrait')]
+    #[Assert\Image]
+    private ?File $portraitFile = null;
 
     public function getId(): ?int
     {
@@ -154,6 +168,18 @@ class Protagonist
     public function setPortrait(?string $portrait): static
     {
         $this->portrait = $portrait;
+
+        return $this;
+    }
+
+    public function getPortraitFile(): ?File
+    {
+        return $this->portraitFile;
+    }
+
+    public function setPortraitFile(?File $portraitFile): static
+    {
+        $this->portraitFile = $portraitFile;
 
         return $this;
     }
