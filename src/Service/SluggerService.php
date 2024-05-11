@@ -15,6 +15,7 @@ readonly class SluggerService
      */
     static function getSlug(string $string): string
     {
+        $string = strtolower($string);
         $slugger = new AsciiSlugger();
         return $slugger->slug($string)->toString();
     }

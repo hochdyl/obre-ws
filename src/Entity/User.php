@@ -27,7 +27,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank]
-    #[Groups(['user.register', 'user', 'game', 'protagonist'])]
+    #[Groups(['user.register', 'user.login', 'user', 'game', 'protagonist'])]
     private ?string $username = null;
 
     /**
@@ -41,7 +41,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     #[ORM\Column]
     #[Assert\NotBlank]
-    #[Groups(['user.register'])]
+    #[Groups(['user.register', 'user.login'])]
     private ?string $password = null;
 
     #[ORM\Column(length: 255, nullable: true)]

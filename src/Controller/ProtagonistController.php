@@ -2,13 +2,15 @@
 
 namespace App\Controller;
 
-use App\DTO\Protagonist\CreateProtagonistDTO;
 use App\Entity\Protagonist;
 use App\Repository\GameRepository;
+use App\Repository\ProtagonistRepository;
 use App\Service\SluggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use App\Exceptions\ObreatlasExceptions;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
@@ -38,30 +40,51 @@ class ProtagonistController extends BaseController
      * Create a new game protagonist
      *
      * @param string $gameSlug
-     * @param CreateProtagonistDTO $protagonistDTO
+     * @param Protagonist $protagonist
+     * @param ProtagonistRepository $protagonistRepository
      * @param GameRepository $gameRepository
      * @param EntityManagerInterface $em
+     * @param Request $request
      * @return JsonResponse
      * @throws Exception
      */
     #[Route(name: 'create', methods: 'POST')]
     public function create(
         string $gameSlug,
-        #[MapRequestPayload] CreateProtagonistDTO $protagonistDTO,
+        #[MapRequestPayload(
+            serializationContext: [
+                'groups' => ['protagonist.create']
+            ]
+        )] Protagonist $protagonist,
+        ProtagonistRepository $protagonistRepository,
         GameRepository $gameRepository,
         EntityManagerInterface $em,
+        Request $request,
     ): JsonResponse
     {
-        $slug = SluggerService::getSlug($protagonistDTO->name);
+        $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
 
-        if ($slug !== $protagonistDTO->slug) {
-            throw new Exception('Slug does not match with name');
+        if (!$game) {
+            throw new Exception(ObreatlasExceptions::GAME_NOT_FOUND);
         }
 
-        dd($protagonistDTO);
+        $slug = SluggerService::getSlug($protagonist->getName());
 
-        $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
-        $protagonist->setGame($game);
+        if ($slug !== $protagonist->getSlug()) {
+            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_NAME);
+        }
+
+        $matchedProtagonist = $protagonistRepository->findByGameAndSlug($gameSlug, $protagonist->getSlug());
+
+        if ($matchedProtagonist) {
+            throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
+        }
+
+        $portrait = $request->files->get('portrait');
+
+        $protagonist
+            ->setGame($game)
+            ->setPortraitFile($portrait);
 
         $em->persist($protagonist);
         $em->flush();

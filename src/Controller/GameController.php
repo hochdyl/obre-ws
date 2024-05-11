@@ -7,6 +7,7 @@ use App\Repository\GameRepository;
 use App\Service\SluggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use App\Exceptions\ObreatlasExceptions;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -69,7 +70,7 @@ class GameController extends BaseController
         $slug = SluggerService::getSlug($game->getTitle());
 
         if ($slug !== $game->getSlug()) {
-            throw new Exception('Slug does not match with title');
+            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
         }
 
         $user = $this->getUser();

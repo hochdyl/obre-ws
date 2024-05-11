@@ -10,11 +10,11 @@ use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Regex;
-use Vich\UploaderBundle\Mapping\Annotation\Uploadable;
-use Vich\UploaderBundle\Mapping\Annotation\UploadableField;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ProtagonistRepository::class)]
-#[Uploadable]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_SLUG', fields: ['slug', 'game'])]
+#[Vich\Uploadable]
 class Protagonist
 {
     #[ORM\Id]
@@ -63,12 +63,10 @@ class Protagonist
     private ?User $owner = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Assert\Url]
-    #[Groups(['protagonist', 'protagonist.create'])]
+    #[Groups(['protagonist'])]
     private ?string $portrait = null;
 
-    #[UploadableField(mapping: 'protagonist', fileNameProperty: 'portrait')]
-    #[Assert\Image]
+    #[Vich\UploadableField(mapping: 'protagonists', fileNameProperty: 'portrait')]
     private ?File $portraitFile = null;
 
     public function getId(): ?int
@@ -177,9 +175,15 @@ class Protagonist
         return $this->portraitFile;
     }
 
-    public function setPortraitFile(?File $portraitFile): static
+    public function setPortraitFile(File $portraitFile): static
     {
         $this->portraitFile = $portraitFile;
+
+        if (null !== $portraitFile) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->updatedAt = new \DateTimeImmutable();
+        }
 
         return $this;
     }

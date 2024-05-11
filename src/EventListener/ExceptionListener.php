@@ -3,7 +3,6 @@
 namespace App\EventListener;
 
 use App\Service\ValidationService;
-use Doctrine\Bundle\DoctrineBundle\Attribute\AsDoctrineListener;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
@@ -21,8 +20,6 @@ final class ExceptionListener
      */
     public function onKernelException(ExceptionEvent $event): void
     {
-        if ($_ENV['APP_ENV'] !== 'prod') return;
-
         $exception = $event->getThrowable();
         $exceptionCode = $exception->getCode();
 

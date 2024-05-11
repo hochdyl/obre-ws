@@ -21,6 +21,17 @@ class ProtagonistRepository extends ServiceEntityRepository
         parent::__construct($registry, Protagonist::class);
     }
 
+    public function findByGameAndSlug(string $gameSlug, string $protagonistSlug)
+    {
+        return $this->createQueryBuilder('c')
+            ->join('c.game', 'g', 'WITH', 'g.slug = :gameSlug')
+            ->andWhere('c.slug = :protagonistSlug')
+            ->setParameter('gameSlug', $gameSlug)
+            ->setParameter('protagonistSlug', $protagonistSlug)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+
     //    /**
     //     * @return Protagonist[] Returns an array of Protagonist objects
     //     */
