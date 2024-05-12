@@ -25,8 +25,8 @@ class ProtagonistController extends BaseController
      * @param GameRepository $gameRepository
      * @return JsonResponse
      */
-    #[Route(name: 'getAllByGame', methods: 'GET')]
-    public function getAllByGame(string $gameSlug, GameRepository $gameRepository): JsonResponse
+    #[Route(name: 'getAll', methods: 'GET')]
+    public function getAll(string $gameSlug, GameRepository $gameRepository): JsonResponse
     {
         $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
         $protagonists = $game->getProtagonists();
@@ -80,11 +80,14 @@ class ProtagonistController extends BaseController
             throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
         }
 
-        $portrait = $request->files->get('portrait');
+        $portrait = $request->files->get('portraitFile');
+
+        $user = $this->getUser();
 
         $protagonist
             ->setGame($game)
-            ->setPortraitFile($portrait);
+            ->setPortraitFile($portrait)
+            ->setCreatedBy($user);
 
         $em->persist($protagonist);
         $em->flush();

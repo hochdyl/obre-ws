@@ -63,7 +63,12 @@ class Game
     private ?string $slug = null;
 
     #[ORM\OneToMany(targetEntity: Protagonist::class, mappedBy: 'game')]
+    #[ORM\OrderBy(['id' => 'DESC'])]
     private Collection $protagonists;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
 
     public function __construct()
     {
@@ -173,6 +178,18 @@ class Game
                 $protagonist->setGame(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

@@ -75,7 +75,9 @@ class GameController extends BaseController
 
         $user = $this->getUser();
 
-        $game->setOwner($user);
+        $game
+            ->setOwner($user)
+            ->setCreatedBy($user);
 
         $em->persist($game);
         $em->flush();

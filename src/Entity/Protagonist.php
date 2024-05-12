@@ -69,6 +69,10 @@ class Protagonist
     #[Vich\UploadableField(mapping: 'protagonists', fileNameProperty: 'portrait')]
     private ?File $portraitFile = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -175,7 +179,7 @@ class Protagonist
         return $this->portraitFile;
     }
 
-    public function setPortraitFile(File $portraitFile): static
+    public function setPortraitFile(?File $portraitFile): static
     {
         $this->portraitFile = $portraitFile;
 
@@ -184,6 +188,18 @@ class Protagonist
             // otherwise the event listeners won't be called and the file is lost
             $this->updatedAt = new \DateTimeImmutable();
         }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

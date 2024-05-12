@@ -2,7 +2,6 @@
 
 namespace App\Fixtures;
 
-use AllowDynamicProperties;
 use App\Entity\AppVersion;
 use App\Entity\Game;
 use App\Entity\User;
@@ -38,7 +37,8 @@ class AppFixtures extends Fixture
             ->setTitle("Fixture game")
             ->setSlug('fixture-game')
             ->setStartedAt(new DateTimeImmutable())
-            ->setOwner($user);
+            ->setOwner($user)
+            ->setCreatedBy($user);
 
         $manager->persist($game);
 
