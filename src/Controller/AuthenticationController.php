@@ -60,7 +60,6 @@ class AuthenticationController extends BaseController
     ): JsonResponse
     {
         $storedUser = $userRepository->findOneBy(['username' => $loginDTO->username]);
-
         if (!$storedUser || !$userPasswordService->isPasswordValid($storedUser, $loginDTO->password)) {
             throw new Exception("Invalid credentials", Response::HTTP_UNAUTHORIZED);
         }

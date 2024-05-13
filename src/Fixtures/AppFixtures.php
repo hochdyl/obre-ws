@@ -38,7 +38,7 @@ class AppFixtures extends Fixture
             ->setSlug('fixture-game')
             ->setStartedAt(new DateTimeImmutable())
             ->setOwner($user)
-            ->setCreatedBy($user);
+            ->setCreator($user);
 
         $manager->persist($game);
 

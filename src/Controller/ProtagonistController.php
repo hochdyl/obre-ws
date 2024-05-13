@@ -2,10 +2,12 @@
 
 namespace App\Controller;
 
+use App\Entity\Upload;
 use App\Entity\Protagonist;
 use App\Repository\GameRepository;
 use App\Repository\ProtagonistRepository;
 use App\Service\SluggerService;
+use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use App\Exceptions\ObreatlasExceptions;
@@ -63,31 +65,32 @@ class ProtagonistController extends BaseController
     ): JsonResponse
     {
         $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
-
         if (!$game) {
             throw new Exception(ObreatlasExceptions::GAME_NOT_FOUND);
         }
 
         $slug = SluggerService::getSlug($protagonist->getName());
-
         if ($slug !== $protagonist->getSlug()) {
             throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_NAME);
         }
 
         $matchedProtagonist = $protagonistRepository->findByGameAndSlug($gameSlug, $protagonist->getSlug());
-
         if ($matchedProtagonist) {
             throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
         }
-
-        $portrait = $request->files->get('portraitFile');
 
         $user = $this->getUser();
 
         $protagonist
             ->setGame($game)
-            ->setPortraitFile($portrait)
-            ->setCreatedBy($user);
+            ->setCreator($user);
+
+        $portrait = $request->files->get('portrait');
+
+        if ($portrait) {
+            $upload = UploaderService::upload($portrait, $user);
+            $protagonist->setPortrait($upload);
+        }
 
         $em->persist($protagonist);
         $em->flush();

@@ -68,7 +68,7 @@ class Game
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $createdBy = null;
+    private ?User $creator = null;
 
     public function __construct()
     {
@@ -182,14 +182,14 @@ class Game
         return $this;
     }
 
-    public function getCreatedBy(): ?User
+    public function getCreator(): ?User
     {
-        return $this->createdBy;
+        return $this->creator;
     }
 
-    public function setCreatedBy(?User $createdBy): static
+    public function setCreator(?User $creator): static
     {
-        $this->createdBy = $createdBy;
+        $this->creator = $creator;
 
         return $this;
     }

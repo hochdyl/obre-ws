@@ -62,16 +62,13 @@ class Protagonist
     #[Groups(['protagonist'])]
     private ?User $owner = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['protagonist'])]
-    private ?string $portrait = null;
-
-    #[Vich\UploadableField(mapping: 'protagonists', fileNameProperty: 'portrait')]
-    private ?File $portraitFile = null;
-
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    private ?User $createdBy = null;
+    private ?User $creator = null;
+
+    #[ORM\OneToOne(cascade: ['persist', 'remove'])]
+    #[Groups(['protagonist'])]
+    private ?Upload $portrait = null;
 
     public function getId(): ?int
     {
@@ -162,44 +159,26 @@ class Protagonist
         return $this;
     }
 
-    public function getPortrait(): ?string
+    public function getCreator(): ?User
+    {
+        return $this->creator;
+    }
+
+    public function setCreator(?User $creator): static
+    {
+        $this->creator = $creator;
+
+        return $this;
+    }
+
+    public function getPortrait(): ?Upload
     {
         return $this->portrait;
     }
 
-    public function setPortrait(?string $portrait): static
+    public function setPortrait(?Upload $portrait): static
     {
         $this->portrait = $portrait;
-
-        return $this;
-    }
-
-    public function getPortraitFile(): ?File
-    {
-        return $this->portraitFile;
-    }
-
-    public function setPortraitFile(?File $portraitFile): static
-    {
-        $this->portraitFile = $portraitFile;
-
-        if (null !== $portraitFile) {
-            // It is required that at least one field changes if you are using doctrine
-            // otherwise the event listeners won't be called and the file is lost
-            $this->updatedAt = new \DateTimeImmutable();
-        }
-
-        return $this;
-    }
-
-    public function getCreatedBy(): ?User
-    {
-        return $this->createdBy;
-    }
-
-    public function setCreatedBy(?User $createdBy): static
-    {
-        $this->createdBy = $createdBy;
 
         return $this;
     }

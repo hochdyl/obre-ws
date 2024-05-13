@@ -68,7 +68,6 @@ class GameController extends BaseController
     ): JsonResponse
     {
         $slug = SluggerService::getSlug($game->getTitle());
-
         if ($slug !== $game->getSlug()) {
             throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
         }
@@ -77,7 +76,7 @@ class GameController extends BaseController
 
         $game
             ->setOwner($user)
-            ->setCreatedBy($user);
+            ->setCreator($user);
 
         $em->persist($game);
         $em->flush();
