@@ -11,7 +11,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class AppVersionController extends BaseController
 {
     /**
-     * Return all app versions with the newest first
+     * Return app versions
      *
      * @param AppVersionRepository $appVersionRepository
      * @return JsonResponse

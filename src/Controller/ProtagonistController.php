@@ -17,17 +17,17 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 
-#[Route('/{gameSlug}/protagonists', name: 'protagonists')]
+#[Route('/protagonists', name: 'protagonists')]
 class ProtagonistController extends BaseController
 {
     /**
-     * Return game's protagonists by slug
+     * Return game's protagonists
      *
      * @param string $gameSlug
      * @param GameRepository $gameRepository
      * @return JsonResponse
      */
-    #[Route(name: 'getAll', methods: 'GET')]
+    #[Route('/{gameSlug}', name: 'getAll', methods: 'GET')]
     public function getAll(string $gameSlug, GameRepository $gameRepository): JsonResponse
     {
         $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
@@ -39,7 +39,7 @@ class ProtagonistController extends BaseController
     }
 
     /**
-     * Create a new game protagonist
+     * Create a game protagonist
      *
      * @param string $gameSlug
      * @param Protagonist $protagonist
@@ -50,7 +50,7 @@ class ProtagonistController extends BaseController
      * @return JsonResponse
      * @throws Exception
      */
-    #[Route(name: 'create', methods: 'POST')]
+    #[Route('/{gameSlug}', name: 'create', methods: 'POST')]
     public function create(
         string $gameSlug,
         #[MapRequestPayload(

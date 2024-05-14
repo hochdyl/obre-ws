@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class AuthenticationController extends BaseController
 {
     /**
-     * Register a new user
+     * Register a user
      *
      * @param User $user
      * @param EntityManagerInterface $em
@@ -47,7 +47,7 @@ class AuthenticationController extends BaseController
     }
 
     /**
-     * Return a user from login form data
+     * Return a user from login data
      *
      * @throws Exception
      */

@@ -17,7 +17,7 @@ use Symfony\Component\Routing\Attribute\Route;
 class GameController extends BaseController
 {
     /**
-     * Return all games with the newest first
+     * Return games
      *
      * @param GameRepository $gameRepository
      * @return JsonResponse
@@ -50,7 +50,7 @@ class GameController extends BaseController
     }
 
     /**
-     * Create a new game
+     * Create a game
      *
      * @param Game $game
      * @param EntityManagerInterface $em
