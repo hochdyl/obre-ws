@@ -70,6 +70,10 @@ class Game
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
+    #[ORM\Column]
+    #[Groups(['game'])]
+    private ?bool $closed = null;
+
     public function __construct()
     {
         $this->protagonists = new ArrayCollection();
@@ -190,6 +194,18 @@ class Game
     public function setCreator(?User $creator): static
     {
         $this->creator = $creator;
+
+        return $this;
+    }
+
+    public function isClosed(): ?bool
+    {
+        return $this->closed;
+    }
+
+    public function setClosed(bool $closed): static
+    {
+        $this->closed = $closed;
 
         return $this;
     }

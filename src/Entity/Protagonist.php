@@ -6,7 +6,6 @@ use App\Repository\ProtagonistRepository;
 use DateTimeImmutable;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Regex;
@@ -49,18 +48,16 @@ class Protagonist
     private ?Game $game = null;
 
     #[ORM\Column]
+    #[Groups(['protagonist'])]
     private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
+    #[Groups(['protagonist'])]
     private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['protagonist.create'])]
     private ?string $story = null;
-
-    #[ORM\OneToOne(inversedBy: 'protagonists', cascade: ['persist', 'remove'])]
-    #[Groups(['protagonist'])]
-    private ?User $owner = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
@@ -69,6 +66,10 @@ class Protagonist
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[Groups(['protagonist'])]
     private ?Upload $portrait = null;
+
+    #[ORM\ManyToOne]
+    #[Groups(['protagonist'])]
+    private ?User $owner = null;
 
     public function getId(): ?int
     {

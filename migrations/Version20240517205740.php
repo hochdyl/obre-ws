@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20240513185020 extends AbstractMigration
+final class Version20240517205740 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,12 +20,12 @@ final class Version20240513185020 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE upload ADD original_name VARCHAR(255) NOT NULL, ADD created_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\', ADD updated_at DATETIME NOT NULL COMMENT \'(DC2Type:datetime_immutable)\'');
+        $this->addSql('ALTER TABLE protagonist DROP INDEX UNIQ_200E10057E3C61F9, ADD INDEX IDX_200E10057E3C61F9 (owner_id)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE upload DROP original_name, DROP created_at, DROP updated_at');
+        $this->addSql('ALTER TABLE protagonist DROP INDEX IDX_200E10057E3C61F9, ADD UNIQUE INDEX UNIQ_200E10057E3C61F9 (owner_id)');
     }
 }

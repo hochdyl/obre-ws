@@ -2,7 +2,6 @@
 
 namespace App\Controller;
 
-use App\Entity\Upload;
 use App\Entity\Protagonist;
 use App\Repository\GameRepository;
 use App\Repository\ProtagonistRepository;
@@ -96,6 +95,23 @@ class ProtagonistController extends BaseController
         $em->flush();
 
         return self::response($protagonist, Response::HTTP_CREATED, [], [
+            'groups' => ['protagonist']
+        ]);
+    }
+
+    #[Route('/choose/{protagonist}', name: 'choose', methods: 'GET')]
+    public function choose(
+        Protagonist $protagonist,
+        EntityManagerInterface $em
+    ): JsonResponse
+    {
+        $user = $this->getUser();
+
+        $protagonist->setOwner($user);
+
+        $em->flush();
+
+        return self::response($protagonist, Response::HTTP_OK, [], [
             'groups' => ['protagonist']
         ]);
     }
