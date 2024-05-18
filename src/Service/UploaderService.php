@@ -19,8 +19,7 @@ readonly class UploaderService
     static function upload(File $file, ?User $uploader): Upload
     {
         $upload = new Upload();
-        $upload
-            ->setFile($file)
+        $upload->setFile($file)
             ->setUploader($uploader);
 
         return $upload;

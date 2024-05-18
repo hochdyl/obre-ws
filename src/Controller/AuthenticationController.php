@@ -6,6 +6,7 @@ use App\DTO\Authentication\LoginUserDTO;
 use App\Entity\User;
 use App\Repository\UserRepository;
 use App\Service\UserPasswordService;
+use App\Service\UserService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -16,14 +17,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/authentication', name: 'authentication')]
 class AuthenticationController extends BaseController
 {
-    /**
-     * Register a user
-     *
-     * @param User $user
-     * @param EntityManagerInterface $em
-     * @param UserPasswordService $userPasswordService
-     * @return JsonResponse
-     */
     #[Route('/register', name: 'register', methods: 'POST')]
     public function register(
         #[MapRequestPayload(
@@ -35,7 +28,7 @@ class AuthenticationController extends BaseController
         UserPasswordService    $userPasswordService,
     ): JsonResponse
     {
-        $userPasswordService->encryptPassword($user);
+        $userPasswordService->hashPassword($user);
         $user->generateSessionToken();
 
         $em->persist($user);
@@ -46,11 +39,7 @@ class AuthenticationController extends BaseController
         ]);
     }
 
-    /**
-     * Return a user from login data
-     *
-     * @throws Exception
-     */
+    /** @throws Exception */
     #[Route('/login', name: 'login', methods: 'POST')]
     public function login(
         #[MapRequestPayload] LoginUserDTO $loginDTO,

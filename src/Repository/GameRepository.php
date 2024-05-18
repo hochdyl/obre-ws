@@ -22,6 +22,31 @@ class GameRepository extends ServiceEntityRepository
         parent::__construct($registry, Game::class);
     }
 
+    /**
+     * Return games available for user
+     *
+     * One of the following statement is required :
+     *
+     * - Game is not closed
+     * - Game is owned by user
+     * - At least one of the game's protagonists is owned by user
+     *
+     * @return Game[] Returns an array of Game objects
+     */
+    public function getGamesAvailableByUser(string $username): array
+    {
+        return $this->createQueryBuilder('g')
+            ->leftJoin('g.owner', 'o')
+            ->leftJoin('g.protagonists', 'p')
+            ->leftJoin('p.owner', 'po')
+            ->where('g.closed = 0')
+            ->orWhere('o.username = :username')
+            ->orWhere('po.username = :username')
+            ->setParameter('username', $username)
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Game[] Returns an array of Game objects
     //     */

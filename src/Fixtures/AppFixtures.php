@@ -27,7 +27,7 @@ class AppFixtures extends Fixture
         $user
             ->setUsername('admin')
             ->setPassword('admin');
-        $this->userPasswordService->encryptPassword($user);
+        $this->userPasswordService->hashPassword($user);
         $user->generateSessionToken();
 
         $manager->persist($user);

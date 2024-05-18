@@ -21,11 +21,14 @@ class ProtagonistRepository extends ServiceEntityRepository
         parent::__construct($registry, Protagonist::class);
     }
 
-    public function findByGameAndSlug(string $gameSlug, string $protagonistSlug)
+    /**
+     * @return Protagonist[] Returns an array of Protagonist objects
+     */
+    public function findByGameAndSlug(string $gameSlug, string $protagonistSlug): array
     {
-        return $this->createQueryBuilder('c')
-            ->join('c.game', 'g', 'WITH', 'g.slug = :gameSlug')
-            ->andWhere('c.slug = :protagonistSlug')
+        return $this->createQueryBuilder('p')
+            ->join('p.game', 'g', 'WITH', 'g.slug = :gameSlug')
+            ->andWhere('p.slug = :protagonistSlug')
             ->setParameter('gameSlug', $gameSlug)
             ->setParameter('protagonistSlug', $protagonistSlug)
             ->getQuery()
@@ -37,10 +40,10 @@ class ProtagonistRepository extends ServiceEntityRepository
     //     */
     //    public function findByExampleField($value): array
     //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
+    //        return $this->createQueryBuilder('p')
+    //            ->andWhere('p.exampleField = :val')
     //            ->setParameter('val', $value)
-    //            ->orderBy('c.id', 'ASC')
+    //            ->orderBy('p.id', 'ASC')
     //            ->setMaxResults(10)
     //            ->getQuery()
     //            ->getResult()
@@ -49,8 +52,8 @@ class ProtagonistRepository extends ServiceEntityRepository
 
     //    public function findOneBySomeField($value): ?Protagonist
     //    {
-    //        return $this->createQueryBuilder('c')
-    //            ->andWhere('c.exampleField = :val')
+    //        return $this->createQueryBuilder('p')
+    //            ->andWhere('p.exampleField = :val')
     //            ->setParameter('val', $value)
     //            ->getQuery()
     //            ->getOneOrNullResult()

@@ -7,7 +7,7 @@ use Symfony\Component\Validator\ConstraintViolationList;
 readonly class ValidationService
 {
     /**
-     * Transform a violation list into an array
+     * Transform a violation list into an associative array
      *
      * @param ConstraintViolationList $violations
      * @return array

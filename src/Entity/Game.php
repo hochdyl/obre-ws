@@ -164,6 +164,23 @@ class Game
         return $this->protagonists;
     }
 
+    /**
+     * @return Collection<int, Protagonist>
+     */
+    public function getProtagonistsAvailableByUser(?User $user): Collection
+    {
+        return $this->protagonists->filter(
+            function (Protagonist $protagonist) use ($user) {
+                if (!$protagonist->getOwner()) return true;
+
+                $isOwnedByUser = $user->getUserIdentifier() === $protagonist->getOwner()->getUserIdentifier();
+                if (!$isOwnedByUser) return false;
+
+                return true;
+            }
+        );
+    }
+
     public function addProtagonist(Protagonist $protagonist): static
     {
         if (!$this->protagonists->contains($protagonist)) {

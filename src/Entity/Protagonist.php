@@ -47,14 +47,6 @@ class Protagonist
     #[ORM\JoinColumn(nullable: false)]
     private ?Game $game = null;
 
-    #[ORM\Column]
-    #[Groups(['protagonist'])]
-    private ?DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column]
-    #[Groups(['protagonist'])]
-    private ?DateTimeImmutable $updatedAt = null;
-
     #[ORM\Column(type: Types::TEXT, nullable: true)]
     #[Groups(['protagonist.create'])]
     private ?string $story = null;
@@ -70,6 +62,14 @@ class Protagonist
     #[ORM\ManyToOne]
     #[Groups(['protagonist'])]
     private ?User $owner = null;
+
+    #[ORM\Column]
+    #[Groups(['protagonist'])]
+    private ?DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    #[Groups(['protagonist'])]
+    private ?DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -108,30 +108,6 @@ class Protagonist
     public function setGame(?Game $game): static
     {
         $this->game = $game;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }
@@ -180,6 +156,30 @@ class Protagonist
     public function setPortrait(?Upload $portrait): static
     {
         $this->portrait = $portrait;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): ?DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

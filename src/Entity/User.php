@@ -49,14 +49,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user'])]
     private ?string $sessionToken = null;
 
+    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'owner')]
+    private Collection $games;
+
     #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
     private ?DateTimeImmutable $updatedAt = null;
 
-    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'owner')]
-    private Collection $games;
 
     public function __construct()
     {
@@ -150,6 +151,36 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+    /**
+     * @return Collection<int, Game>
+     */
+    public function getGames(): Collection
+    {
+        return $this->games;
+    }
+
+    public function addGame(Game $game): static
+    {
+        if (!$this->games->contains($game)) {
+            $this->games->add($game);
+            $game->setOwner($this);
+        }
+
+        return $this;
+    }
+
+    public function removeGame(Game $game): static
+    {
+        if ($this->games->removeElement($game)) {
+            // set the owning side to null (unless already changed)
+            if ($game->getOwner() === $this) {
+                $game->setOwner(null);
+            }
+        }
+
+        return $this;
+    }
+
     public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
@@ -177,36 +208,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function generateSessionToken(): User
     {
         $this->setSessionToken(Uuid::v1());
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Game>
-     */
-    public function getGames(): Collection
-    {
-        return $this->games;
-    }
-
-    public function addGame(Game $game): static
-    {
-        if (!$this->games->contains($game)) {
-            $this->games->add($game);
-            $game->setOwner($this);
-        }
-
-        return $this;
-    }
-
-    public function removeGame(Game $game): static
-    {
-        if ($this->games->removeElement($game)) {
-            // set the owning side to null (unless already changed)
-            if ($game->getOwner() === $this) {
-                $game->setOwner(null);
-            }
-        }
 
         return $this;
     }

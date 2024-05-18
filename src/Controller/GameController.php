@@ -16,29 +16,18 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/games', name: 'games')]
 class GameController extends BaseController
 {
-    /**
-     * Return games
-     *
-     * @param GameRepository $gameRepository
-     * @return JsonResponse
-     */
     #[Route(name: 'getAll', methods: 'GET')]
     public function getAll(GameRepository $gameRepository): JsonResponse
     {
-        $games = $gameRepository->findBy([], ['id' => 'DESC']);
+        $user = $this->getUser();
+
+        $games = $gameRepository->getGamesAvailableByUser($user->getUserIdentifier());
 
         return self::response($games, Response::HTTP_OK, [], [
             'groups' => ['game']
         ]);
     }
 
-    /**
-     * Return a game by slug
-     *
-     * @param string $slug
-     * @param GameRepository $gameRepository
-     * @return JsonResponse
-     */
     #[Route('/{slug}', name: 'get', methods: 'GET')]
     public function get(string $slug, GameRepository $gameRepository): JsonResponse
     {
@@ -49,14 +38,7 @@ class GameController extends BaseController
         ]);
     }
 
-    /**
-     * Create a game
-     *
-     * @param Game $game
-     * @param EntityManagerInterface $em
-     * @return JsonResponse
-     * @throws Exception
-     */
+    /** @throws Exception */
     #[Route(name: 'create', methods: 'POST')]
     public function create(
         #[MapRequestPayload(

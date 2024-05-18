@@ -4,6 +4,9 @@ namespace App\Security\Voter;
 
 use App\Entity\Protagonist;
 use App\Entity\User;
+use App\Exceptions\ObreatlasExceptions;
+use App\Service\SluggerService;
+use Exception;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -17,19 +20,18 @@ class ProtagonistVoter extends Voter
             && $subject instanceof Protagonist;
     }
 
+    /** @throws Exception */
     protected function voteOnAttribute(string $attribute, mixed $subject, TokenInterface $token): bool
     {
         $user = $token->getUser();
 
-        if (!$user instanceof User) {
+        if (!$user instanceof User || !$subject instanceof Protagonist) {
             return false;
         }
 
         switch ($attribute) {
             case self::CHOOSE:
-                if ($subject->getOwner()) return false;
-                if ($subject->getGame()->getClosed()) return false;
-                return true;
+                return !$subject->getOwner();
         }
 
         return false;

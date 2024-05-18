@@ -2,78 +2,68 @@
 
 namespace App\Controller;
 
+use App\Entity\Game;
 use App\Entity\Protagonist;
-use App\Repository\GameRepository;
 use App\Repository\ProtagonistRepository;
+use App\Security\Voter\GameVoter;
+use App\Security\Voter\ProtagonistVoter;
 use App\Service\SluggerService;
 use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use App\Exceptions\ObreatlasExceptions;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
+use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/protagonists', name: 'protagonists')]
 class ProtagonistController extends BaseController
 {
-    /**
-     * Return game's protagonists
-     *
-     * @param string $gameSlug
-     * @param GameRepository $gameRepository
-     * @return JsonResponse
-     */
     #[Route('/{gameSlug}', name: 'getAll', methods: 'GET')]
-    public function getAll(string $gameSlug, GameRepository $gameRepository): JsonResponse
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: "You can't view this game")]
+    public function getAll(
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])] Game $game,
+        Security $security
+    ): JsonResponse
     {
-        $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
-        $protagonists = $game->getProtagonists();
+        $user = $this->getUser();
+
+        $isOwner = $security->isGranted(GameVoter::EDIT, $game);
+
+        $protagonists = $isOwner ?
+            $game->getProtagonists() :
+            $game->getProtagonistsAvailableByUser($user);
 
         return self::response($protagonists, Response::HTTP_OK, [], [
             'groups' => ['protagonist']
         ]);
     }
 
-    /**
-     * Create a game protagonist
-     *
-     * @param string $gameSlug
-     * @param Protagonist $protagonist
-     * @param ProtagonistRepository $protagonistRepository
-     * @param GameRepository $gameRepository
-     * @param EntityManagerInterface $em
-     * @param Request $request
-     * @return JsonResponse
-     * @throws Exception
-     */
+    /** @throws Exception */
     #[Route('/{gameSlug}', name: 'create', methods: 'POST')]
     public function create(
-        string $gameSlug,
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])] Game $game,
         #[MapRequestPayload(
             serializationContext: [
                 'groups' => ['protagonist.create']
             ]
         )] Protagonist $protagonist,
         ProtagonistRepository $protagonistRepository,
-        GameRepository $gameRepository,
         EntityManagerInterface $em,
         Request $request,
     ): JsonResponse
     {
-        $game = $gameRepository->findOneBy(['slug' => $gameSlug]);
-        if (!$game) {
-            throw new Exception(ObreatlasExceptions::GAME_NOT_FOUND);
-        }
-
         $slug = SluggerService::getSlug($protagonist->getName());
         if ($slug !== $protagonist->getSlug()) {
             throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_NAME);
         }
 
-        $matchedProtagonist = $protagonistRepository->findByGameAndSlug($gameSlug, $protagonist->getSlug());
+        $matchedProtagonist = $protagonistRepository->findByGameAndSlug($game->getSlug(), $protagonist->getSlug());
         if ($matchedProtagonist) {
             throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
         }
@@ -99,9 +89,10 @@ class ProtagonistController extends BaseController
         ]);
     }
 
-    #[Route('/choose/{protagonist}', name: 'choose', methods: 'GET')]
+    #[Route('/choose/{protagonistId}', name: 'choose', methods: 'GET')]
+    #[IsGranted(ProtagonistVoter::CHOOSE, subject: 'protagonist', message: "You can't choose this protagonist")]
     public function choose(
-        Protagonist $protagonist,
+        #[MapEntity(mapping: ['protagonistId' => 'id'])] Protagonist $protagonist,
         EntityManagerInterface $em
     ): JsonResponse
     {

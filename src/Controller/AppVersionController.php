@@ -10,12 +10,6 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/app-versions', name: 'appVersion')]
 class AppVersionController extends BaseController
 {
-    /**
-     * Return app versions
-     *
-     * @param AppVersionRepository $appVersionRepository
-     * @return JsonResponse
-     */
     #[Route(name: 'getAll', methods: 'GET')]
     public function getAll(AppVersionRepository $appVersionRepository): JsonResponse
     {
