@@ -27,7 +27,8 @@ class ProtagonistController extends BaseController
     #[Route('/{gameSlug}', name: 'getAll', methods: 'GET')]
     #[IsGranted(GameVoter::VIEW, subject: 'game', message: "You can't view this game")]
     public function getAll(
-        #[MapEntity(mapping: ['gameSlug' => 'slug'])] Game $game,
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        Game $game,
         Security $security
     ): JsonResponse
     {
@@ -47,12 +48,14 @@ class ProtagonistController extends BaseController
     /** @throws Exception */
     #[Route('/{gameSlug}', name: 'create', methods: 'POST')]
     public function create(
-        #[MapEntity(mapping: ['gameSlug' => 'slug'])] Game $game,
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        Game $game,
         #[MapRequestPayload(
             serializationContext: [
                 'groups' => ['protagonist.create']
             ]
-        )] Protagonist $protagonist,
+        )]
+        Protagonist $protagonist,
         ProtagonistRepository $protagonistRepository,
         EntityManagerInterface $em,
         Request $request,
@@ -70,8 +73,7 @@ class ProtagonistController extends BaseController
 
         $user = $this->getUser();
 
-        $protagonist
-            ->setGame($game)
+        $protagonist->setGame($game)
             ->setCreator($user);
 
         $portrait = $request->files->get('portrait');
@@ -92,7 +94,8 @@ class ProtagonistController extends BaseController
     #[Route('/choose/{protagonistId}', name: 'choose', methods: 'GET')]
     #[IsGranted(ProtagonistVoter::CHOOSE, subject: 'protagonist', message: "You can't choose this protagonist")]
     public function choose(
-        #[MapEntity(mapping: ['protagonistId' => 'id'])] Protagonist $protagonist,
+        #[MapEntity(mapping: ['protagonistId' => 'id'])]
+        Protagonist $protagonist,
         EntityManagerInterface $em
     ): JsonResponse
     {

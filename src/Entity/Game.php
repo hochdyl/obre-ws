@@ -53,6 +53,7 @@ class Game
     private ?string $title = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank]
     #[Regex(
         pattern: '/^[a-zA-Z0-9\- ]+$/',
         message: 'Slug contains wrong characters',

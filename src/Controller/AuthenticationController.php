@@ -23,7 +23,8 @@ class AuthenticationController extends BaseController
             serializationContext: [
                 'groups' => ['user.register']
             ]
-        )] User                $user,
+        )]
+        User $user,
         EntityManagerInterface $em,
         UserPasswordService    $userPasswordService,
     ): JsonResponse
@@ -42,10 +43,11 @@ class AuthenticationController extends BaseController
     /** @throws Exception */
     #[Route('/login', name: 'login', methods: 'POST')]
     public function login(
-        #[MapRequestPayload] LoginUserDTO $loginDTO,
-        EntityManagerInterface            $em,
-        UserRepository                    $userRepository,
-        UserPasswordService               $userPasswordService
+        #[MapRequestPayload]
+        LoginUserDTO $loginDTO,
+        EntityManagerInterface $em,
+        UserRepository $userRepository,
+        UserPasswordService $userPasswordService
     ): JsonResponse
     {
         $storedUser = $userRepository->findOneBy(['username' => $loginDTO->username]);

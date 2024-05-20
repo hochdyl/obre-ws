@@ -17,15 +17,13 @@ class AppFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $version = new AppVersion();
-        $version
-            ->setName('Vanish')
+        $version->setName('Vanish')
             ->setNumber("0.1.0");
 
         $manager->persist($version);
 
         $user = new User();
-        $user
-            ->setUsername('admin')
+        $user->setUsername('admin')
             ->setPassword('admin');
         $this->userPasswordService->hashPassword($user);
         $user->generateSessionToken();
@@ -33,8 +31,7 @@ class AppFixtures extends Fixture
         $manager->persist($user);
 
         $game = new Game();
-        $game
-            ->setTitle("Fixture game")
+        $game->setTitle("Fixture game")
             ->setSlug('fixture-game')
             ->setStartedAt(new DateTimeImmutable())
             ->setOwner($user)

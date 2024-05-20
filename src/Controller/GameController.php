@@ -2,12 +2,14 @@
 
 namespace App\Controller;
 
+use App\DTO\Game\EditGameDTO;
 use App\Entity\Game;
 use App\Repository\GameRepository;
 use App\Service\SluggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use App\Exceptions\ObreatlasExceptions;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
@@ -45,10 +47,42 @@ class GameController extends BaseController
             serializationContext: [
                 'groups' => ['game.create']
             ]
-        )] Game                $game,
+        )]
+        Game $game,
         EntityManagerInterface $em,
     ): JsonResponse
     {
+        $slug = SluggerService::getSlug($game->getTitle());
+        if ($slug !== $game->getSlug()) {
+            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
+        }
+
+        $user = $this->getUser();
+
+        $game->setOwner($user)
+            ->setCreator($user)
+            ->setClosed(false);
+
+        $em->persist($game);
+        $em->flush();
+
+        return self::response($game, Response::HTTP_CREATED, [], [
+            'groups' => ['game']
+        ]);
+    }
+
+    /** @throws Exception */
+    #[Route('/{gameSlug}', name: 'edit', methods: 'PUT')]
+    public function edit(
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        Game $game,
+        #[MapRequestPayload]
+        EditGameDTO $gameDTO,
+        EntityManagerInterface $em,
+    ): JsonResponse
+    {
+        // TODO: bah finir ca en gros
+
         $slug = SluggerService::getSlug($game->getTitle());
         if ($slug !== $game->getSlug()) {
             throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
