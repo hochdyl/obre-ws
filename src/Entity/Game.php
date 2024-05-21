@@ -165,21 +165,28 @@ class Game
         return $this->protagonists;
     }
 
-    /**
-     * @return Collection<int, Protagonist>
-     */
-    public function getProtagonistsAvailableByUser(?User $user): Collection
+    public function getProtagonistsAvailableByUser(?User $user): array
     {
-        return $this->protagonists->filter(
+        $protagonists = $this->protagonists->filter(
             function (Protagonist $protagonist) use ($user) {
                 if (!$protagonist->getOwner()) return true;
 
-                $isOwnedByUser = $user->getUserIdentifier() === $protagonist->getOwner()->getUserIdentifier();
-                if (!$isOwnedByUser) return false;
-
-                return true;
+                return $user->getUserIdentifier() === $protagonist->getOwner()->getUserIdentifier();
             }
         );
+        return $protagonists->getValues();
+    }
+
+    public function getProtagonistsOwnedByUser(?User $user): array
+    {
+        $protagonists = $this->protagonists->filter(
+            function (Protagonist $protagonist) use ($user) {
+                if (!$protagonist->getOwner()) return false;
+
+                return $protagonist->getOwner()->getUserIdentifier() === $user->getUserIdentifier();
+            }
+        );
+        return $protagonists->getValues();
     }
 
     public function addProtagonist(Protagonist $protagonist): static

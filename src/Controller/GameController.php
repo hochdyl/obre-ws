@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\DTO\Game\EditGameDTO;
 use App\Entity\Game;
 use App\Repository\GameRepository;
+use App\Security\Voter\GameVoter;
 use App\Service\SluggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
@@ -14,6 +15,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route('/games', name: 'games')]
 class GameController extends BaseController
@@ -30,11 +32,13 @@ class GameController extends BaseController
         ]);
     }
 
-    #[Route('/{slug}', name: 'get', methods: 'GET')]
-    public function get(string $slug, GameRepository $gameRepository): JsonResponse
+    #[Route('/{gameSlug}', name: 'get', methods: 'GET')]
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: "You can't view this game")]
+    public function get(
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        Game $game,
+    ): JsonResponse
     {
-        $game = $gameRepository->findOneBy(['slug' => $slug]);
-
         return self::response($game, Response::HTTP_OK, [], [
             'groups' => ['game']
         ]);
@@ -73,6 +77,7 @@ class GameController extends BaseController
 
     /** @throws Exception */
     #[Route('/{gameSlug}', name: 'edit', methods: 'PUT')]
+    #[IsGranted(GameVoter::EDIT, subject: 'game', message: "You can't edit this game")]
     public function edit(
         #[MapEntity(mapping: ['gameSlug' => 'slug'])]
         Game $game,

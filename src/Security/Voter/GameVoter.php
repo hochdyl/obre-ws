@@ -30,7 +30,7 @@ class GameVoter extends Voter
 
         switch ($attribute) {
             case self::VIEW:
-                $protagonistsOwned = $subject->getProtagonistsAvailableByUser($user);
+                $protagonistsOwned = $subject->getProtagonistsOwnedByUser($user);
 
                 if(count($protagonistsOwned) > 0) return true;
                 if ($subject->isClosed()) return false;

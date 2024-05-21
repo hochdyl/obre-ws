@@ -19,6 +19,7 @@ class AppVersion
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['appVersion'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
