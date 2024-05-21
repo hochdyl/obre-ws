@@ -84,7 +84,7 @@ class GameController extends BaseController
         EntityManagerInterface $em,
     ): JsonResponse
     {
-        SluggerService::validateSlug($game->getTitle(), $game->getSlug());
+        SluggerService::validateSlug($game->getTitle(), $gameDTO->slug);
 
         $game->setTitle($gameDTO->title)
             ->setSlug($gameDTO->slug)

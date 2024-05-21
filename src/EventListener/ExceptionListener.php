@@ -3,6 +3,7 @@
 namespace App\EventListener;
 
 use App\Service\ValidationService;
+use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
@@ -45,6 +46,13 @@ final class ExceptionListener
                 $type = 'data';
                 $value = ValidationService::getViolations($violations);
             }
+        }
+
+        // Check if exception come from EntityValueResolver
+        if ($filename === pathinfo(EntityValueResolver::class)['filename']) {
+            preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
+            $code = 404;
+            $value = "Mapped entity \"$matches[0]\" not found";
         }
 
         $response = new JsonResponse([

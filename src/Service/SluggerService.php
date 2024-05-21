@@ -17,9 +17,9 @@ readonly class SluggerService
     {
         $string = strtolower($string);
         $slugger = new AsciiSlugger();
-        $slugged = $slugger->slug($string)->toString();
+        $sluggedString = $slugger->slug($string)->toString();
 
-        if ($slugged !== $slug) {
+        if ($sluggedString !== $slug) {
             throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
         }
 
