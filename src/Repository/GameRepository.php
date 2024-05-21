@@ -3,7 +3,6 @@
 namespace App\Repository;
 
 use App\Entity\Game;
-use App\Service\SluggerService;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 

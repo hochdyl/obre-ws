@@ -4,8 +4,6 @@ namespace App\Security\Voter;
 
 use App\Entity\Protagonist;
 use App\Entity\User;
-use App\Exceptions\ObreatlasExceptions;
-use App\Service\SluggerService;
 use Exception;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;

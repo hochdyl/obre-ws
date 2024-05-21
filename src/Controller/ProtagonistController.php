@@ -61,10 +61,7 @@ class ProtagonistController extends BaseController
         Request $request,
     ): JsonResponse
     {
-        $slug = SluggerService::getSlug($protagonist->getName());
-        if ($slug !== $protagonist->getSlug()) {
-            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_NAME);
-        }
+        SluggerService::validateSlug($protagonist->getName(), $protagonist->getSlug());
 
         $matchedProtagonist = $protagonistRepository->findByGameAndSlug($game->getSlug(), $protagonist->getSlug());
         if ($matchedProtagonist) {

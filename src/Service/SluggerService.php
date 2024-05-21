@@ -2,21 +2,27 @@
 
 namespace App\Service;
 
-use Symfony\Component\String\AbstractUnicodeString;
+use App\Exceptions\ObreatlasExceptions;
+use Exception;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 
 readonly class SluggerService
 {
     /**
-     * Create a slug based on a string
+     * Verify slug validity
      *
-     * @param string $string
-     * @return AbstractUnicodeString
+     * @throws Exception
      */
-    static function getSlug(string $string): string
+    static function validateSlug(string $string, string $slug): bool
     {
         $string = strtolower($string);
         $slugger = new AsciiSlugger();
-        return $slugger->slug($string)->toString();
+        $slugged = $slugger->slug($string)->toString();
+
+        if ($slugged !== $slug) {
+            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
+        }
+
+        return true;
     }
 }

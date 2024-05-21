@@ -9,7 +9,6 @@ use App\Security\Voter\GameVoter;
 use App\Service\SluggerService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use App\Exceptions\ObreatlasExceptions;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
@@ -56,10 +55,7 @@ class GameController extends BaseController
         EntityManagerInterface $em,
     ): JsonResponse
     {
-        $slug = SluggerService::getSlug($game->getTitle());
-        if ($slug !== $game->getSlug()) {
-            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
-        }
+        SluggerService::validateSlug($game->getTitle(), $game->getSlug());
 
         $user = $this->getUser();
 
@@ -75,7 +71,9 @@ class GameController extends BaseController
         ]);
     }
 
-    /** @throws Exception */
+    /**
+     * @throws Exception
+     */
     #[Route('/{gameSlug}', name: 'edit', methods: 'PUT')]
     #[IsGranted(GameVoter::EDIT, subject: 'game', message: "You can't edit this game")]
     public function edit(
@@ -86,24 +84,16 @@ class GameController extends BaseController
         EntityManagerInterface $em,
     ): JsonResponse
     {
-        // TODO: bah finir ca en gros
+        SluggerService::validateSlug($game->getTitle(), $game->getSlug());
 
-        $slug = SluggerService::getSlug($game->getTitle());
-        if ($slug !== $game->getSlug()) {
-            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
-        }
+        $game->setTitle($gameDTO->title)
+            ->setSlug($gameDTO->slug)
+            ->setStartedAt($gameDTO->startedAt)
+            ->setClosed($gameDTO->closed);
 
-        $user = $this->getUser();
-
-        $game
-            ->setOwner($user)
-            ->setCreator($user)
-            ->setClosed(false);
-
-        $em->persist($game);
         $em->flush();
 
-        return self::response($game, Response::HTTP_CREATED, [], [
+        return self::response($game, Response::HTTP_OK, [], [
             'groups' => ['game']
         ]);
     }
