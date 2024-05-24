@@ -25,8 +25,8 @@ class Protagonist
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Regex(
-        pattern: '/^[a-zA-Z0-9\- ]+$/',
-        message: 'Title contains wrong characters',
+        pattern: '/^(?!edit$)[a-zA-Z0-9\- ]+$/',
+        message: 'Name is invalid',
         match: true
 
     )]
@@ -36,8 +36,8 @@ class Protagonist
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Regex(
-        pattern: '/^[a-zA-Z0-9\- ]+$/',
-        message: 'Slug contains wrong characters',
+        pattern: '/^(?!edit$)[a-zA-Z0-9\- ]+$/',
+        message: 'Slug is invalid',
         match: true
 
     )]
@@ -49,12 +49,8 @@ class Protagonist
     private ?Game $game = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
-    #[Groups(['protagonist.create'])]
+    #[Groups(['protagonist', 'protagonist.create'])]
     private ?string $story = null;
-
-    #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    private ?User $creator = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
     #[Groups(['protagonist'])]
@@ -64,12 +60,14 @@ class Protagonist
     #[Groups(['protagonist'])]
     private ?User $owner = null;
 
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $creator = null;
+
     #[ORM\Column]
-    #[Groups(['protagonist'])]
     private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    #[Groups(['protagonist'])]
     private ?DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
@@ -137,18 +135,6 @@ class Protagonist
         return $this;
     }
 
-    public function getCreator(): ?User
-    {
-        return $this->creator;
-    }
-
-    public function setCreator(?User $creator): static
-    {
-        $this->creator = $creator;
-
-        return $this;
-    }
-
     public function getPortrait(): ?Upload
     {
         return $this->portrait;
@@ -157,6 +143,18 @@ class Protagonist
     public function setPortrait(?Upload $portrait): static
     {
         $this->portrait = $portrait;
+
+        return $this;
+    }
+
+    public function getCreator(): ?User
+    {
+        return $this->creator;
+    }
+
+    public function setCreator(?User $creator): static
+    {
+        $this->creator = $creator;
 
         return $this;
     }

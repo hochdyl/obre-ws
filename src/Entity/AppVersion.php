@@ -46,7 +46,6 @@ class AppVersion
     private ?string $bugfix = null;
 
     #[ORM\Column]
-    #[Groups(['appVersion'])]
     private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]

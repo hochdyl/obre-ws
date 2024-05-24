@@ -26,7 +26,7 @@ class ProtagonistRepository extends ServiceEntityRepository
      * @param string $protagonistSlug
      * @return array|null Returns a Protagonist object or null
      */
-    public function findByGameAndSlug(string $gameSlug, string $protagonistSlug): array | null
+    public function findByGameAndSlug(string $gameSlug, string $protagonistSlug): Protagonist | null
     {
         return $this->createQueryBuilder('p')
             ->join('p.game', 'g', 'WITH', 'g.slug = :gameSlug')

@@ -14,7 +14,7 @@ security:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
-            pattern: ^/(?!authentication/login$|authentication/register$).*
+            pattern: ^/(?!app-versions|authentication).*$
             provider: user_provider
             custom_authenticator: App\Security\SessionTokenAuthenticator
             stateless: true

@@ -39,7 +39,7 @@ class GameController extends BaseController
     ): JsonResponse
     {
         return self::response($game, Response::HTTP_OK, [], [
-            'groups' => ['game']
+            'groups' => ['game', 'game.details', 'protagonist']
         ]);
     }
 

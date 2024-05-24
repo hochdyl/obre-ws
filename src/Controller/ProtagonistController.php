@@ -45,6 +45,21 @@ class ProtagonistController extends BaseController
         ]);
     }
 
+    #[Route('/{gameSlug}/{protagonistSlug}', name: 'get', methods: 'GET')]
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: "You can't view this game")]
+    #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: "You can't view this protagonist")]
+    public function get(
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        Game $game,
+        #[MapEntity(mapping: ['protagonistSlug' => 'slug'])]
+        Protagonist $protagonist,
+    ): JsonResponse
+    {
+        return self::response($game, Response::HTTP_OK, [], [
+            'groups' => ['game']
+        ]);
+    }
+
     /** @throws Exception */
     #[Route('/{gameSlug}', name: 'create', methods: 'POST')]
     public function create(

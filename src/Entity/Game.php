@@ -28,14 +28,6 @@ class Game
     #[Groups(['game'])]
     private ?User $owner = null;
 
-    #[ORM\Column]
-    #[Groups(['game'])]
-    private ?DateTimeImmutable $createdAt = null;
-
-    #[ORM\Column]
-    #[Groups(['game'])]
-    private ?DateTimeImmutable $updatedAt = null;
-
     #[ORM\Column()]
     #[Assert\NotBlank]
     #[Groups(['game', 'game.create'])]
@@ -44,8 +36,8 @@ class Game
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Regex(
-        pattern: '/^[a-zA-Z0-9\- ]+$/',
-        message: 'Title contains wrong characters',
+        pattern: '/^(?!games$)[a-zA-Z0-9\- ]+$/',
+        message: 'Title is invalid',
         match: true
 
     )]
@@ -55,8 +47,8 @@ class Game
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Regex(
-        pattern: '/^[a-zA-Z0-9\- ]+$/',
-        message: 'Slug contains wrong characters',
+        pattern: '/^(?!games$)[a-zA-Z0-9\- ]+$/',
+        message: 'Slug is invalid',
         match: true
 
     )]
@@ -65,15 +57,22 @@ class Game
 
     #[ORM\OneToMany(targetEntity: Protagonist::class, mappedBy: 'game')]
     #[ORM\OrderBy(['id' => 'DESC'])]
+    #[Groups(['game.details'])]
     private Collection $protagonists;
+
+    #[ORM\Column]
+    #[Groups(['game'])]
+    private ?bool $closed = null;
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $creator = null;
 
     #[ORM\Column]
-    #[Groups(['game'])]
-    private ?bool $closed = null;
+    private ?DateTimeImmutable $createdAt = null;
+
+    #[ORM\Column]
+    private ?DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -93,30 +92,6 @@ class Game
     public function setOwner(?User $owner): static
     {
         $this->owner = $owner;
-
-        return $this;
-    }
-
-    public function getCreatedAt(): ?DateTimeImmutable
-    {
-        return $this->createdAt;
-    }
-
-    public function setCreatedAt(DateTimeImmutable $createdAt): static
-    {
-        $this->createdAt = $createdAt;
-
-        return $this;
-    }
-
-    public function getUpdatedAt(): ?DateTimeImmutable
-    {
-        return $this->updatedAt;
-    }
-
-    public function setUpdatedAt(DateTimeImmutable $updatedAt): static
-    {
-        $this->updatedAt = $updatedAt;
 
         return $this;
     }
@@ -211,6 +186,18 @@ class Game
         return $this;
     }
 
+    public function isClosed(): ?bool
+    {
+        return $this->closed;
+    }
+
+    public function setClosed(bool $closed): static
+    {
+        $this->closed = $closed;
+
+        return $this;
+    }
+
     public function getCreator(): ?User
     {
         return $this->creator;
@@ -223,14 +210,26 @@ class Game
         return $this;
     }
 
-    public function isClosed(): ?bool
+    public function getCreatedAt(): ?DateTimeImmutable
     {
-        return $this->closed;
+        return $this->createdAt;
     }
 
-    public function setClosed(bool $closed): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
-        $this->closed = $closed;
+        $this->createdAt = $createdAt;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?DateTimeImmutable
+    {
+        return $this->updatedAt;
+    }
+
+    public function setUpdatedAt(DateTimeImmutable $updatedAt): static
+    {
+        $this->updatedAt = $updatedAt;
 
         return $this;
     }

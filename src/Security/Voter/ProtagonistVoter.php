@@ -10,11 +10,12 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
 class ProtagonistVoter extends Voter
 {
+    public const VIEW = 'PROTAGONIST_VIEW';
     public const CHOOSE = 'PROTAGONIST_CHOOSE';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::CHOOSE])
+        return in_array($attribute, [self::VIEW, self::CHOOSE])
             && $subject instanceof Protagonist;
     }
 
@@ -28,6 +29,11 @@ class ProtagonistVoter extends Voter
         }
 
         switch ($attribute) {
+            case self::VIEW:
+                if ($subject->getGame()->getOwner()->getUserIdentifier() === $user->getUserIdentifier()) return true;
+                if ($subject->getOwner() && $subject->getOwner()->getId() !== $user->getUserIdentifier()) return false;
+                return true;
+
             case self::CHOOSE:
                 return !$subject->getOwner();
         }
