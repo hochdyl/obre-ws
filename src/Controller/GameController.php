@@ -4,6 +4,7 @@ namespace App\Controller;
 
 use App\DTO\Game\EditGameDTO;
 use App\Entity\Game;
+use App\Exceptions\ObreatlasExceptions;
 use App\Repository\GameRepository;
 use App\Security\Voter\GameVoter;
 use App\Service\SluggerService;
@@ -32,7 +33,7 @@ class GameController extends BaseController
     }
 
     #[Route('/{gameSlug}', name: 'get', methods: 'GET')]
-    #[IsGranted(GameVoter::VIEW, subject: 'game', message: "You can't view this game")]
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
     public function get(
         #[MapEntity(mapping: ['gameSlug' => 'slug'])]
         Game $game,
@@ -75,7 +76,7 @@ class GameController extends BaseController
      * @throws Exception
      */
     #[Route('/{gameSlug}', name: 'edit', methods: 'PUT')]
-    #[IsGranted(GameVoter::EDIT, subject: 'game', message: "You can't edit this game")]
+    #[IsGranted(GameVoter::EDIT, subject: 'game', message: ObreatlasExceptions::CANT_EDIT_GAME)]
     public function edit(
         #[MapEntity(mapping: ['gameSlug' => 'slug'])]
         Game $game,

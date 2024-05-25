@@ -24,44 +24,36 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[Route('/protagonists', name: 'protagonists')]
 class ProtagonistController extends BaseController
 {
-    #[Route('/{gameSlug}', name: 'getAll', methods: 'GET')]
-    #[IsGranted(GameVoter::VIEW, subject: 'game', message: "You can't view this game")]
-    public function getAll(
-        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
-        Game $game,
-        Security $security
+    /** @throws Exception */
+    #[Route('/choose/{protagonistId}', name: 'choose', methods: 'GET')]
+    #[IsGranted(ProtagonistVoter::CHOOSE, subject: 'protagonist', message: ObreatlasExceptions::CANT_CHOOSE_PROTAGONIST)]
+    public function choose(
+        #[MapEntity(mapping: ['protagonistId' => 'id'])]
+        Protagonist $protagonist,
+        Security $security,
+        EntityManagerInterface $em
     ): JsonResponse
     {
+        $canViewGame = $security->isGranted(GameVoter::VIEW, $protagonist->getGame());
+
+        if (!$canViewGame) {
+            throw new Exception(ObreatlasExceptions::CANT_VIEW_GAME);
+        }
+
         $user = $this->getUser();
 
-        $isOwner = $security->isGranted(GameVoter::EDIT, $game);
+        $protagonist->setOwner($user);
 
-        $protagonists = $isOwner ?
-            $game->getProtagonists() :
-            $game->getProtagonistsAvailableByUser($user);
+        $em->flush();
 
-        return self::response($protagonists, Response::HTTP_OK, [], [
+        return self::response($protagonist, Response::HTTP_OK, [], [
             'groups' => ['protagonist']
-        ]);
-    }
-
-    #[Route('/{gameSlug}/{protagonistSlug}', name: 'get', methods: 'GET')]
-    #[IsGranted(GameVoter::VIEW, subject: 'game', message: "You can't view this game")]
-    #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: "You can't view this protagonist")]
-    public function get(
-        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
-        Game $game,
-        #[MapEntity(mapping: ['protagonistSlug' => 'slug'])]
-        Protagonist $protagonist,
-    ): JsonResponse
-    {
-        return self::response($game, Response::HTTP_OK, [], [
-            'groups' => ['game']
         ]);
     }
 
     /** @throws Exception */
     #[Route('/{gameSlug}', name: 'create', methods: 'POST')]
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
     public function create(
         #[MapEntity(mapping: ['gameSlug' => 'slug'])]
         Game $game,
@@ -76,12 +68,12 @@ class ProtagonistController extends BaseController
         Request $request,
     ): JsonResponse
     {
-        SluggerService::validateSlug($protagonist->getName(), $protagonist->getSlug());
-
         $matchedProtagonist = $protagonistRepository->findByGameAndSlug($game->getSlug(), $protagonist->getSlug());
         if ($matchedProtagonist) {
             throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
         }
+
+        SluggerService::validateSlug($protagonist->getName(), $protagonist->getSlug());
 
         $user = $this->getUser();
 
@@ -103,21 +95,28 @@ class ProtagonistController extends BaseController
         ]);
     }
 
-    #[Route('/choose/{protagonistId}', name: 'choose', methods: 'GET')]
-    #[IsGranted(ProtagonistVoter::CHOOSE, subject: 'protagonist', message: "You can't choose this protagonist")]
-    public function choose(
-        #[MapEntity(mapping: ['protagonistId' => 'id'])]
-        Protagonist $protagonist,
-        EntityManagerInterface $em
+    /** @throws Exception */
+    #[Route('/{gameSlug}/{protagonistSlug}', name: 'get', methods: 'GET')]
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
+    public function get(
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        Game $game,
+        string $protagonistSlug,
+        ProtagonistRepository $protagonistRepository,
+        Security $security
     ): JsonResponse
     {
-        $user = $this->getUser();
+        $matchedProtagonist = $protagonistRepository->findByGameAndSlug($game->getSlug(), $protagonistSlug);
+        if (!$matchedProtagonist) {
+            throw new Exception(ObreatlasExceptions::PROTAGONIST_NOT_EXIST);
+        }
 
-        $protagonist->setOwner($user);
+        $canViewProtagonist = $security->isGranted(ProtagonistVoter::VIEW, $matchedProtagonist);
+        if (!$canViewProtagonist) {
+            throw new Exception(ObreatlasExceptions::CANT_VIEW_PROTAGONIST);
+        }
 
-        $em->flush();
-
-        return self::response($protagonist, Response::HTTP_OK, [], [
+        return self::response($matchedProtagonist, Response::HTTP_OK, [], [
             'groups' => ['protagonist']
         ]);
     }
