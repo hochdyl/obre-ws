@@ -21,7 +21,7 @@ class AuthenticationController extends BaseController
     public function register(
         #[MapRequestPayload(
             serializationContext: [
-                'groups' => ['user.register']
+                'groups' => ['user.register', 'user.authenticate']
             ]
         )]
         User $user,
@@ -36,7 +36,7 @@ class AuthenticationController extends BaseController
         $em->flush();
 
         return self::response($user, Response::HTTP_CREATED, [], [
-            'groups' => ['user']
+            'groups' => ['user', 'user.authenticate']
         ]);
     }
 
@@ -61,7 +61,7 @@ class AuthenticationController extends BaseController
         $em->flush();
 
         return self::response($storedUser, Response::HTTP_OK, [], [
-            'groups' => ['user']
+            'groups' => ['user', 'user.authenticate']
         ]);
     }
 }

@@ -35,12 +35,12 @@ class GameRepository extends ServiceEntityRepository
     public function getGamesAvailableByUser(string $username): array
     {
         return $this->createQueryBuilder('g')
-            ->leftJoin('g.owner', 'o')
-            ->leftJoin('g.protagonists', 'p')
-            ->leftJoin('p.owner', 'po')
+            ->leftJoin('g.owner', 'go')
+            ->leftJoin('g.protagonists', 'gp')
+            ->leftJoin('gp.owner', 'gpo')
             ->where('g.closed = 0')
-            ->orWhere('o.username = :username')
-            ->orWhere('po.username = :username')
+            ->orWhere('go.username = :username')
+            ->orWhere('gpo.username = :username')
             ->setParameter('username', $username)
             ->getQuery()
             ->getResult();

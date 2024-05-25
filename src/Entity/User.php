@@ -22,12 +22,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['user', 'game', 'protagonist'])]
+    #[Groups(['user'])]
     private ?int $id = null;
 
     #[ORM\Column(length: 180, unique: true)]
     #[Assert\NotBlank]
-    #[Groups(['user.register', 'user', 'game', 'protagonist'])]
+    #[Groups(['user.register', 'user'])]
     private ?string $username = null;
 
     /**
@@ -46,7 +46,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(length: 255, nullable: true)]
     #[Assert\Unique]
-    #[Groups(['user'])]
+    #[Groups(['user.authenticate'])]
     private ?string $sessionToken = null;
 
     #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'owner')]

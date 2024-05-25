@@ -46,6 +46,7 @@ class Protagonist
 
     #[ORM\ManyToOne(inversedBy: 'protagonists')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['protagonist.dashboard'])]
     private ?Game $game = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -62,6 +63,7 @@ class Protagonist
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['protagonist.dashboard'])]
     private ?User $creator = null;
 
     #[ORM\Column]

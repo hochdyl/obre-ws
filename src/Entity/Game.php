@@ -57,7 +57,7 @@ class Game
 
     #[ORM\OneToMany(targetEntity: Protagonist::class, mappedBy: 'game')]
     #[ORM\OrderBy(['id' => 'DESC'])]
-    #[Groups(['game.details'])]
+    #[Groups(['game.dashboard'])]
     private Collection $protagonists;
 
     #[ORM\Column]
@@ -140,28 +140,31 @@ class Game
         return $this->protagonists;
     }
 
-    public function getProtagonistsAvailableByUser(?User $user): array
+    public function filterProtagonistsAvailableByUser(?User $user): Game
     {
-        $protagonists = $this->protagonists->filter(
-            function (Protagonist $protagonist) use ($user) {
-                if (!$protagonist->getOwner()) return true;
+        // If owner of the game, return everything
+        if ($this->getOwner()->getUserIdentifier() === $user->getUserIdentifier()) return $this;
 
-                return $user->getUserIdentifier() === $protagonist->getOwner()->getUserIdentifier();
+        foreach ($this->protagonists as $protagonist) {
+            if ($protagonist->getOwner() && $protagonist->getOwner()->getUserIdentifier() !== $user->getUserIdentifier()) {
+                $this->removeProtagonist($protagonist);
             }
-        );
-        return $protagonists->getValues();
+        }
+
+        $this->protagonists = new ArrayCollection($this->protagonists->getValues());
+
+        return $this;
     }
 
-    public function getProtagonistsOwnedByUser(?User $user): array
+    public function getProtagonistsOwnedByUser(?User $user): Collection
     {
-        $protagonists = $this->protagonists->filter(
+        return $this->protagonists->filter(
             function (Protagonist $protagonist) use ($user) {
                 if (!$protagonist->getOwner()) return false;
 
                 return $protagonist->getOwner()->getUserIdentifier() === $user->getUserIdentifier();
             }
         );
-        return $protagonists->getValues();
     }
 
     public function addProtagonist(Protagonist $protagonist): static

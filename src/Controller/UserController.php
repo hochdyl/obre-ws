@@ -13,7 +13,7 @@ class UserController extends BaseController
     public function self(): JsonResponse
     {
         return self::response($this->getUser(), Response::HTTP_OK, [], [
-            'groups' => ['user']
+            'groups' => ['user', 'user.authenticate']
         ]);
     }
 }

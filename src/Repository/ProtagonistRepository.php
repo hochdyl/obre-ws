@@ -29,7 +29,7 @@ class ProtagonistRepository extends ServiceEntityRepository
     public function findByGameAndSlug(string $gameSlug, string $protagonistSlug): Protagonist | null
     {
         return $this->createQueryBuilder('p')
-            ->join('p.game', 'g', 'WITH', 'g.slug = :gameSlug')
+            ->join('p.game', 'pg', 'WITH', 'pg.slug = :gameSlug')
             ->andWhere('p.slug = :protagonistSlug')
             ->setParameter('gameSlug', $gameSlug)
             ->setParameter('protagonistSlug', $protagonistSlug)

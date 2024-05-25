@@ -28,7 +28,7 @@ class GameController extends BaseController
         $games = $gameRepository->getGamesAvailableByUser($user->getUserIdentifier());
 
         return self::response($games, Response::HTTP_OK, [], [
-            'groups' => ['game']
+            'groups' => ['game', 'user']
         ]);
     }
 
@@ -39,8 +39,12 @@ class GameController extends BaseController
         Game $game,
     ): JsonResponse
     {
+        $user = $this->getUser();
+
+        $game->filterProtagonistsAvailableByUser($user);
+
         return self::response($game, Response::HTTP_OK, [], [
-            'groups' => ['game', 'game.details', 'protagonist']
+            'groups' => ['game', 'game.dashboard', 'protagonist', 'user']
         ]);
     }
 
@@ -68,24 +72,24 @@ class GameController extends BaseController
         $em->flush();
 
         return self::response($game, Response::HTTP_CREATED, [], [
-            'groups' => ['game']
+            'groups' => ['game', 'user']
         ]);
     }
 
     /**
      * @throws Exception
      */
-    #[Route('/{gameSlug}', name: 'edit', methods: 'PUT')]
+    #[Route('/{gameId}', name: 'edit', methods: 'PUT')]
     #[IsGranted(GameVoter::EDIT, subject: 'game', message: ObreatlasExceptions::CANT_EDIT_GAME)]
     public function edit(
-        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        #[MapEntity(mapping: ['gameId' => 'id'])]
         Game $game,
         #[MapRequestPayload]
         EditGameDTO $gameDTO,
         EntityManagerInterface $em,
     ): JsonResponse
     {
-        SluggerService::validateSlug($game->getTitle(), $gameDTO->slug);
+        SluggerService::validateSlug($gameDTO->title, $gameDTO->slug);
 
         $game->setTitle($gameDTO->title)
             ->setSlug($gameDTO->slug)
@@ -95,7 +99,7 @@ class GameController extends BaseController
         $em->flush();
 
         return self::response($game, Response::HTTP_OK, [], [
-            'groups' => ['game']
+            'groups' => ['game', 'user']
         ]);
     }
 }

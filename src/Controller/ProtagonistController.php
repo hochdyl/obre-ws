@@ -35,7 +35,6 @@ class ProtagonistController extends BaseController
     ): JsonResponse
     {
         $canViewGame = $security->isGranted(GameVoter::VIEW, $protagonist->getGame());
-
         if (!$canViewGame) {
             throw new Exception(ObreatlasExceptions::CANT_VIEW_GAME);
         }
@@ -47,7 +46,7 @@ class ProtagonistController extends BaseController
         $em->flush();
 
         return self::response($protagonist, Response::HTTP_OK, [], [
-            'groups' => ['protagonist']
+            'groups' => ['protagonist', 'user']
         ]);
     }
 
@@ -91,7 +90,7 @@ class ProtagonistController extends BaseController
         $em->flush();
 
         return self::response($protagonist, Response::HTTP_CREATED, [], [
-            'groups' => ['protagonist']
+            'groups' => ['protagonist', 'user']
         ]);
     }
 
@@ -117,7 +116,7 @@ class ProtagonistController extends BaseController
         }
 
         return self::response($matchedProtagonist, Response::HTTP_OK, [], [
-            'groups' => ['protagonist']
+            'groups' => ['protagonist', 'protagonist.dashboard', 'user', 'game']
         ]);
     }
 }
