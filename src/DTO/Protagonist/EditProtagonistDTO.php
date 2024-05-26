@@ -1,35 +1,31 @@
 <?php
 
-namespace App\DTO\Game;
+namespace App\DTO\Protagonist;
 
-use DateTimeImmutable;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Validator\Constraints\Regex;
 
-class EditGameDTO
+class EditProtagonistDTO
 {
     public function __construct(
         #[Assert\NotBlank]
         #[Regex(
-            pattern: '/^(?!games$)[a-zA-Z0-9\- ]+$/',
-            message: 'Title is invalid',
+            pattern: '/^(?!edit$)[a-zA-Z0-9\- ]+$/',
+            message: 'Name is invalid',
             match: true
 
         )]
-        public string $title,
+        public string $name,
 
         #[Assert\NotBlank]
         #[Regex(
-            pattern: '/^(?!games$)[a-zA-Z0-9\- ]+$/',
+            pattern: '/^(?!edit$)[a-zA-Z0-9\- ]+$/',
             message: 'Slug is invalid',
             match: true
 
         )]
         public string $slug,
 
-        #[Assert\NotBlank]
-        public ?DateTimeImmutable $startedAt = new DateTimeImmutable(),
-
-        public ?bool $closed = false
+        public ?string $story = null,
     ) {}
 }

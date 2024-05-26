@@ -32,24 +32,8 @@ class GameController extends BaseController
         ]);
     }
 
-    #[Route('/{gameSlug}', name: 'get', methods: 'GET')]
-    #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
-    public function get(
-        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
-        Game $game,
-    ): JsonResponse
-    {
-        $user = $this->getUser();
-
-        $game->filterProtagonistsAvailableByUser($user);
-
-        return self::response($game, Response::HTTP_OK, [], [
-            'groups' => ['game', 'game.dashboard', 'protagonist', 'user']
-        ]);
-    }
-
     /** @throws Exception */
-    #[Route(name: 'create', methods: 'POST')]
+    #[Route('/create', name: 'create', methods: 'POST')]
     public function create(
         #[MapRequestPayload(
             serializationContext: [
@@ -76,20 +60,41 @@ class GameController extends BaseController
         ]);
     }
 
-    /**
-     * @throws Exception
-     */
-    #[Route('/{gameId}', name: 'edit', methods: 'PUT')]
+    #[Route('/{gameSlug}', name: 'get', methods: 'GET')]
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
+    public function get(
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        Game $game,
+    ): JsonResponse
+    {
+        $user = $this->getUser();
+
+        $game->filterProtagonistsAvailableByUser($user);
+
+        return self::response($game, Response::HTTP_OK, [], [
+            'groups' => ['game', 'game.dashboard', 'protagonist', 'user']
+        ]);
+    }
+
+    /** @throws Exception */
+    #[Route('/{gameId}/edit', name: 'edit', methods: 'PUT')]
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
     #[IsGranted(GameVoter::EDIT, subject: 'game', message: ObreatlasExceptions::CANT_EDIT_GAME)]
     public function edit(
         #[MapEntity(mapping: ['gameId' => 'id'])]
         Game $game,
         #[MapRequestPayload]
         EditGameDTO $gameDTO,
+        GameRepository $gameRepository,
         EntityManagerInterface $em,
     ): JsonResponse
     {
         SluggerService::validateSlug($gameDTO->title, $gameDTO->slug);
+
+        $matchedGame = $gameRepository->findOneBy(['slug' => $gameDTO->slug]);
+        if ($matchedGame) {
+            throw new Exception(ObreatlasExceptions::GAME_EXIST);
+        }
 
         $game->setTitle($gameDTO->title)
             ->setSlug($gameDTO->slug)

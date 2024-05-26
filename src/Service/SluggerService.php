@@ -20,7 +20,7 @@ readonly class SluggerService
         $sluggedString = $slugger->slug($string)->toString();
 
         if ($sluggedString !== $slug) {
-            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH_TITLE);
+            throw new Exception(ObreatlasExceptions::SLUG_NOT_MATCH);
         }
 
         return true;

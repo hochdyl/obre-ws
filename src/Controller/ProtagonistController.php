@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\DTO\Protagonist\EditProtagonistDTO;
 use App\Entity\Game;
 use App\Entity\Protagonist;
 use App\Repository\ProtagonistRepository;
@@ -25,7 +26,52 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class ProtagonistController extends BaseController
 {
     /** @throws Exception */
-    #[Route('/choose/{protagonistId}', name: 'choose', methods: 'GET')]
+    #[Route('/{gameSlug}/create', name: 'create', methods: 'POST')]
+    #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
+    public function create(
+        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
+        Game $game,
+        #[MapRequestPayload(
+            serializationContext: [
+                'groups' => ['protagonist.create']
+            ]
+        )]
+        Protagonist $protagonist,
+        ProtagonistRepository $protagonistRepository,
+        EntityManagerInterface $em,
+        Request $request,
+    ): JsonResponse
+    {
+        SluggerService::validateSlug($protagonist->getName(), $protagonist->getSlug());
+
+        $matchedProtagonist = $protagonistRepository->findByGameAndSlug($game->getSlug(), $protagonist->getSlug());
+        if ($matchedProtagonist) {
+            throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
+        }
+
+        $user = $this->getUser();
+
+        $protagonist->setGame($game)
+            ->setCreator($user);
+
+        $portrait = $request->files->get('portrait');
+
+        if ($portrait) {
+            $upload = UploaderService::upload($portrait, $user);
+            $protagonist->setPortrait($upload);
+        }
+
+        $em->persist($protagonist);
+        $em->flush();
+
+        return self::response($protagonist, Response::HTTP_CREATED, [], [
+            'groups' => ['protagonist', 'user']
+        ]);
+    }
+
+    /** @throws Exception */
+    #[Route('/{protagonistId}/choose', name: 'choose', methods: 'GET')]
+    #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: ObreatlasExceptions::CANT_VIEW_PROTAGONIST)]
     #[IsGranted(ProtagonistVoter::CHOOSE, subject: 'protagonist', message: ObreatlasExceptions::CANT_CHOOSE_PROTAGONIST)]
     public function choose(
         #[MapEntity(mapping: ['protagonistId' => 'id'])]
@@ -51,33 +97,31 @@ class ProtagonistController extends BaseController
     }
 
     /** @throws Exception */
-    #[Route('/{gameSlug}', name: 'create', methods: 'POST')]
-    #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
-    public function create(
-        #[MapEntity(mapping: ['gameSlug' => 'slug'])]
-        Game $game,
-        #[MapRequestPayload(
-            serializationContext: [
-                'groups' => ['protagonist.create']
-            ]
-        )]
+    #[Route('/{protagonistId}/edit', name: 'edit', methods: 'POST')]
+    #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: ObreatlasExceptions::CANT_VIEW_PROTAGONIST)]
+    #[IsGranted(ProtagonistVoter::EDIT, subject: 'protagonist', message: ObreatlasExceptions::CANT_EDIT_PROTAGONIST)]
+    public function edit(
+        #[MapEntity(mapping: ['protagonistId' => 'id'])]
         Protagonist $protagonist,
-        ProtagonistRepository $protagonistRepository,
+        #[MapRequestPayload]
+        EditProtagonistDTO $protagonistDTO,
+        Security $security,
         EntityManagerInterface $em,
         Request $request,
     ): JsonResponse
     {
-        $matchedProtagonist = $protagonistRepository->findByGameAndSlug($game->getSlug(), $protagonist->getSlug());
-        if ($matchedProtagonist) {
-            throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
-        }
+        SluggerService::validateSlug($protagonistDTO->name, $protagonistDTO->slug);
 
-        SluggerService::validateSlug($protagonist->getName(), $protagonist->getSlug());
+        $canViewGame = $security->isGranted(GameVoter::VIEW, $protagonist->getGame());
+        if (!$canViewGame) {
+            throw new Exception(ObreatlasExceptions::CANT_VIEW_GAME);
+        }
 
         $user = $this->getUser();
 
-        $protagonist->setGame($game)
-            ->setCreator($user);
+        $protagonist->setName($protagonistDTO->name)
+            ->setSlug($protagonistDTO->slug)
+            ->setStory($protagonistDTO->story);
 
         $portrait = $request->files->get('portrait');
 
@@ -86,10 +130,9 @@ class ProtagonistController extends BaseController
             $protagonist->setPortrait($upload);
         }
 
-        $em->persist($protagonist);
         $em->flush();
 
-        return self::response($protagonist, Response::HTTP_CREATED, [], [
+        return self::response($protagonist, Response::HTTP_OK, [], [
             'groups' => ['protagonist', 'user']
         ]);
     }
