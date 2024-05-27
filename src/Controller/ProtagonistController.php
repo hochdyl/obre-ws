@@ -52,10 +52,10 @@ class ProtagonistController extends BaseController
         $user = $this->getUser();
 
         $protagonist->setGame($game)
-            ->setCreator($user);
+            ->setCreator($user)
+            ->setLevel(1);
 
         $portrait = $request->files->get('portrait');
-
         if ($portrait) {
             $upload = UploaderService::upload($portrait, $user);
             $protagonist->setPortrait($upload);
@@ -105,26 +105,20 @@ class ProtagonistController extends BaseController
         Protagonist $protagonist,
         #[MapRequestPayload]
         EditProtagonistDTO $protagonistDTO,
-        Security $security,
         EntityManagerInterface $em,
         Request $request,
     ): JsonResponse
     {
         SluggerService::validateSlug($protagonistDTO->name, $protagonistDTO->slug);
 
-        $canViewGame = $security->isGranted(GameVoter::VIEW, $protagonist->getGame());
-        if (!$canViewGame) {
-            throw new Exception(ObreatlasExceptions::CANT_VIEW_GAME);
-        }
-
         $user = $this->getUser();
 
         $protagonist->setName($protagonistDTO->name)
             ->setSlug($protagonistDTO->slug)
-            ->setStory($protagonistDTO->story);
+            ->setStory($protagonistDTO->story)
+            ->setLevel($protagonistDTO->level);
 
         $portrait = $request->files->get('portrait');
-
         if ($portrait) {
             $upload = UploaderService::upload($portrait, $user);
             $protagonist->setPortrait($upload);

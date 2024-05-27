@@ -67,6 +67,11 @@ class Protagonist
     private ?User $creator = null;
 
     #[ORM\Column]
+    #[Assert\GreaterThanOrEqual(1)]
+    #[Groups(['protagonist'])]
+    private ?int $level = null;
+
+    #[ORM\Column]
     private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
@@ -157,6 +162,18 @@ class Protagonist
     public function setCreator(?User $creator): static
     {
         $this->creator = $creator;
+
+        return $this;
+    }
+
+    public function getLevel(): ?int
+    {
+        return $this->level;
+    }
+
+    public function setLevel(int $level): static
+    {
+        $this->level = $level;
 
         return $this;
     }

@@ -26,6 +26,9 @@ class EditProtagonistDTO
         )]
         public string $slug,
 
-        public ?string $story = null,
+        #[Assert\GreaterThanOrEqual(1)]
+        public int $level,
+
+        public ?string $story = null
     ) {}
 }

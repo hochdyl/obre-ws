@@ -42,11 +42,7 @@ class ProtagonistVoter extends Voter
                 return !$subject->getOwner();
 
             case self::EDIT:
-                return (
-                    $subject->getGame()->getOwner()->getUserIdentifier() === $user->getUserIdentifier() ||
-                    ($subject->getOwner() && $subject->getOwner()->getUserIdentifier() === $user->getUserIdentifier()) ||
-                    (!$subject->getOwner() && $subject->getCreator()->getUserIdentifier() === $user->getUserIdentifier())
-                );
+                return $subject->getGame()->getOwner()->getUserIdentifier() === $user->getUserIdentifier();
         }
 
         return false;
