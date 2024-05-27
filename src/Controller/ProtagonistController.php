@@ -105,11 +105,20 @@ class ProtagonistController extends BaseController
         Protagonist $protagonist,
         #[MapRequestPayload]
         EditProtagonistDTO $protagonistDTO,
+        ProtagonistRepository $protagonistRepository,
         EntityManagerInterface $em,
         Request $request,
     ): JsonResponse
     {
         SluggerService::validateSlug($protagonistDTO->name, $protagonistDTO->slug);
+
+        // Protagonist name update
+        if ($protagonistDTO->slug !== $protagonist->getSlug()) {
+            $matchedProtagonist = $protagonistRepository->findByGameAndSlug($protagonist->getGame()->getSlug(), $protagonist->getSlug());
+            if ($matchedProtagonist) {
+                throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
+            }
+        }
 
         $user = $this->getUser();
 

@@ -91,9 +91,12 @@ class GameController extends BaseController
     {
         SluggerService::validateSlug($gameDTO->title, $gameDTO->slug);
 
-        $matchedGame = $gameRepository->findOneBy(['slug' => $gameDTO->slug]);
-        if ($matchedGame) {
-            throw new Exception(ObreatlasExceptions::GAME_EXIST);
+        // Game title update
+        if ($gameDTO->slug !== $game->getSlug()) {
+            $matchedGame = $gameRepository->findOneBy(['slug' => $gameDTO->slug]);
+            if ($matchedGame) {
+                throw new Exception(ObreatlasExceptions::GAME_EXIST);
+            }
         }
 
         $game->setTitle($gameDTO->title)
