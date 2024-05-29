@@ -32,7 +32,7 @@ class ProtagonistVoter extends Voter
         switch ($attribute) {
             case self::VIEW:
                 if (
-                    $subject->getGame()->getOwner()->getUserIdentifier() === $user->getUserIdentifier() ||
+                    $subject->getGame()->getGameMaster()->getUserIdentifier() === $user->getUserIdentifier() ||
                     !$subject->getOwner()
                 ) return true;
 
@@ -42,7 +42,7 @@ class ProtagonistVoter extends Voter
                 return !$subject->getOwner();
 
             case self::EDIT:
-                return $subject->getGame()->getOwner()->getUserIdentifier() === $user->getUserIdentifier();
+                return $subject->getGame()->getGameMaster()->getUserIdentifier() === $user->getUserIdentifier();
         }
 
         return false;

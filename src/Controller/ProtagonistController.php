@@ -99,7 +99,7 @@ class ProtagonistController extends BaseController
     /** @throws Exception */
     #[Route('/{protagonistId}/edit', name: 'edit', methods: 'POST')]
     #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: ObreatlasExceptions::CANT_VIEW_PROTAGONIST)]
-    #[IsGranted(ProtagonistVoter::EDIT, subject: 'protagonist', message: ObreatlasExceptions::CANT_EDIT_PROTAGONIST)]
+    #[IsGranted(ProtagonistVoter::EDIT, subject: 'protagonist', message: ObreatlasExceptions::NOT_GAME_MASTER)]
     public function edit(
         #[MapEntity(mapping: ['protagonistId' => 'id'])]
         Protagonist $protagonist,
@@ -114,7 +114,7 @@ class ProtagonistController extends BaseController
 
         // Protagonist name update
         if ($protagonistDTO->slug !== $protagonist->getSlug()) {
-            $matchedProtagonist = $protagonistRepository->findByGameAndSlug($protagonist->getGame()->getSlug(), $protagonist->getSlug());
+            $matchedProtagonist = $protagonistRepository->findByGameAndSlug($protagonist->getGame()->getSlug(), $protagonistDTO->slug);
             if ($matchedProtagonist) {
                 throw new Exception(ObreatlasExceptions::PROTAGONIST_EXIST);
             }

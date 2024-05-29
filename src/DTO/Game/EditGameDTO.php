@@ -11,7 +11,7 @@ class EditGameDTO
     public function __construct(
         #[Assert\NotBlank]
         #[Regex(
-            pattern: '/^(?!games$)[a-zA-Z0-9\- ]+$/',
+            pattern: '/^(?!login$|register$)[a-zA-Z0-9\- ]+$/',
             message: 'Title is invalid',
             match: true
 
@@ -20,7 +20,7 @@ class EditGameDTO
 
         #[Assert\NotBlank]
         #[Regex(
-            pattern: '/^(?!games$)[a-zA-Z0-9\- ]+$/',
+            pattern: '/^(?!login$|register$)[a-zA-Z0-9\- ]+$/',
             message: 'Slug is invalid',
             match: true
 

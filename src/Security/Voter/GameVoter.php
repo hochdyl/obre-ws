@@ -3,9 +3,7 @@
 namespace App\Security\Voter;
 
 use App\Entity\Game;
-use App\Entity\Protagonist;
 use App\Entity\User;
-use App\Service\UserService;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 
@@ -32,14 +30,14 @@ class GameVoter extends Voter
             case self::VIEW:
                 $protagonistsOwned = $subject->getProtagonistsOwnedByUser($user);
                 if (
-                    $subject->getOwner()->getUserIdentifier() === $user->getUserIdentifier() ||
+                    $subject->getGameMaster()->getUserIdentifier() === $user->getUserIdentifier() ||
                     count($protagonistsOwned) > 0
                 ) return true;
 
                 return !$subject->isClosed();
 
             case self::EDIT:
-                return $subject->getOwner()->getUserIdentifier() === $user->getUserIdentifier();
+                return $subject->getGameMaster()->getUserIdentifier() === $user->getUserIdentifier();
         }
 
         return false;

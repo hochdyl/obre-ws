@@ -48,7 +48,7 @@ class GameController extends BaseController
 
         $user = $this->getUser();
 
-        $game->setOwner($user)
+        $game->setGameMaster($user)
             ->setCreator($user)
             ->setClosed(false);
 
@@ -79,7 +79,7 @@ class GameController extends BaseController
     /** @throws Exception */
     #[Route('/{gameId}/edit', name: 'edit', methods: 'PUT')]
     #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
-    #[IsGranted(GameVoter::EDIT, subject: 'game', message: ObreatlasExceptions::CANT_EDIT_GAME)]
+    #[IsGranted(GameVoter::EDIT, subject: 'game', message: ObreatlasExceptions::NOT_GAME_MASTER)]
     public function edit(
         #[MapEntity(mapping: ['gameId' => 'id'])]
         Game $game,

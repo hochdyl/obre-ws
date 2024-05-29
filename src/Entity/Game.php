@@ -26,7 +26,7 @@ class Game
     #[ORM\ManyToOne(inversedBy: 'games')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['game'])]
-    private ?User $owner = null;
+    private ?User $gameMaster = null;
 
     #[ORM\Column()]
     #[Assert\NotBlank]
@@ -36,7 +36,7 @@ class Game
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Regex(
-        pattern: '/^(?!games$)[a-zA-Z0-9\- ]+$/',
+        pattern: '/^(?!login$|register$)[a-zA-Z0-9\- ]+$/',
         message: 'Title is invalid',
         match: true
 
@@ -47,7 +47,7 @@ class Game
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
     #[Regex(
-        pattern: '/^(?!games$)[a-zA-Z0-9\- ]+$/',
+        pattern: '/^(?!login$|register$)[a-zA-Z0-9\- ]+$/',
         message: 'Slug is invalid',
         match: true
 
@@ -84,14 +84,14 @@ class Game
         return $this->id;
     }
 
-    public function getOwner(): ?User
+    public function getGameMaster(): ?User
     {
-        return $this->owner;
+        return $this->gameMaster;
     }
 
-    public function setOwner(?User $owner): static
+    public function setGameMaster(?User $gameMaster): static
     {
-        $this->owner = $owner;
+        $this->gameMaster = $gameMaster;
 
         return $this;
     }
@@ -142,8 +142,8 @@ class Game
 
     public function filterProtagonistsAvailableByUser(?User $user): Game
     {
-        // If owner of the game, return everything
-        if ($this->getOwner()->getUserIdentifier() === $user->getUserIdentifier()) return $this;
+        // If user is game master, return everything
+        if ($this->getGameMaster()->getUserIdentifier() === $user->getUserIdentifier()) return $this;
 
         foreach ($this->protagonists as $protagonist) {
             if ($protagonist->getOwner() && $protagonist->getOwner()->getUserIdentifier() !== $user->getUserIdentifier()) {

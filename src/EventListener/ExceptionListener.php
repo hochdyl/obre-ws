@@ -52,7 +52,7 @@ final class ExceptionListener
         if ($filename === pathinfo(EntityValueResolver::class)['filename']) {
             preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
             $code = 404;
-            $value = "\"$matches[0]\" not found";
+            $value = "$matches[0] not found";
         }
 
         $response = new JsonResponse([
