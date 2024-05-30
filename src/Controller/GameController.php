@@ -72,14 +72,14 @@ class GameController extends BaseController
         $game->filterProtagonistsAvailableByUser($user);
 
         return self::response($game, Response::HTTP_OK, [], [
-            'groups' => ['game', 'game.dashboard', 'protagonist', 'user']
+            'groups' => ['game', 'game.lobby', 'protagonist', 'user']
         ]);
     }
 
     /** @throws Exception */
     #[Route('/{gameId}/edit', name: 'edit', methods: 'PUT')]
     #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
-    #[IsGranted(GameVoter::EDIT, subject: 'game', message: ObreatlasExceptions::NOT_GAME_MASTER)]
+    #[IsGranted(GameVoter::GAME_MASTER, subject: 'game', message: ObreatlasExceptions::NOT_GAME_MASTER)]
     public function edit(
         #[MapEntity(mapping: ['gameId' => 'id'])]
         Game $game,

@@ -10,11 +10,11 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class GameVoter extends Voter
 {
     public const VIEW = 'GAME_VIEW';
-    public const EDIT = 'GAME_EDIT';
+    public const GAME_MASTER = 'GAME_GAME_MASTER';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::VIEW, self::EDIT])
+        return in_array($attribute, [self::VIEW, self::GAME_MASTER])
             && $subject instanceof Game;
     }
 
@@ -36,7 +36,7 @@ class GameVoter extends Voter
 
                 return !$subject->isClosed();
 
-            case self::EDIT:
+            case self::GAME_MASTER:
                 return $subject->getGameMaster()->getUserIdentifier() === $user->getUserIdentifier();
         }
 

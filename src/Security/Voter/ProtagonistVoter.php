@@ -12,11 +12,10 @@ class ProtagonistVoter extends Voter
 {
     public const VIEW = 'PROTAGONIST_VIEW';
     public const CHOOSE = 'PROTAGONIST_CHOOSE';
-    public const EDIT = 'PROTAGONIST_EDIT';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
-        return in_array($attribute, [self::VIEW, self::CHOOSE, self::EDIT])
+        return in_array($attribute, [self::VIEW, self::CHOOSE])
             && $subject instanceof Protagonist;
     }
 
@@ -40,9 +39,6 @@ class ProtagonistVoter extends Voter
 
             case self::CHOOSE:
                 return !$subject->getOwner();
-
-            case self::EDIT:
-                return $subject->getGame()->getGameMaster()->getUserIdentifier() === $user->getUserIdentifier();
         }
 
         return false;

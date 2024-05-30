@@ -99,18 +99,23 @@ class ProtagonistController extends BaseController
     /** @throws Exception */
     #[Route('/{protagonistId}/edit', name: 'edit', methods: 'POST')]
     #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: ObreatlasExceptions::CANT_VIEW_PROTAGONIST)]
-    #[IsGranted(ProtagonistVoter::EDIT, subject: 'protagonist', message: ObreatlasExceptions::NOT_GAME_MASTER)]
     public function edit(
         #[MapEntity(mapping: ['protagonistId' => 'id'])]
         Protagonist $protagonist,
         #[MapRequestPayload]
         EditProtagonistDTO $protagonistDTO,
         ProtagonistRepository $protagonistRepository,
+        Security $security,
         EntityManagerInterface $em,
         Request $request,
     ): JsonResponse
     {
         SluggerService::validateSlug($protagonistDTO->name, $protagonistDTO->slug);
+
+        $isGameMaster = $security->isGranted(GameVoter::GAME_MASTER, $protagonist->getGame());
+        if (!$isGameMaster) {
+            throw new Exception(ObreatlasExceptions::NOT_GAME_MASTER);
+        }
 
         // Protagonist name update
         if ($protagonistDTO->slug !== $protagonist->getSlug()) {
@@ -162,7 +167,7 @@ class ProtagonistController extends BaseController
         }
 
         return self::response($matchedProtagonist, Response::HTTP_OK, [], [
-            'groups' => ['protagonist', 'protagonist.dashboard', 'user', 'game']
+            'groups' => ['protagonist', 'protagonist.play', 'user', 'game']
         ]);
     }
 }
