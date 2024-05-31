@@ -167,7 +167,7 @@ class ProtagonistController extends BaseController
         }
 
         return self::response($matchedProtagonist, Response::HTTP_OK, [], [
-            'groups' => ['protagonist', 'protagonist.play', 'user', 'game']
+            'groups' => ['protagonist', 'protagonist.data', 'user', 'game']
         ]);
     }
 }
