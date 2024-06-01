@@ -17,12 +17,11 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
-use Symfony\Component\Serializer\Exception\ExceptionInterface;
 
 #[Route('/metrics', name: 'metrics')]
 class MetricController extends AbstractController
 {
-    /** @throws Exception|ExceptionInterface */
+    /** @throws Exception */
     #[Route('/{protagonistId}/edit', name: 'edit', methods: 'POST')]
     #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: ObreatlasExceptions::CANT_VIEW_PROTAGONIST)]
     public function edit(
