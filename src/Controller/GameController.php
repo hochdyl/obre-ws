@@ -48,7 +48,8 @@ class GameController extends BaseController
 
         $user = $this->getUser();
 
-        $game->setGameMaster($user)
+        $game
+            ->setGameMaster($user)
             ->setCreator($user)
             ->setClosed(false);
 
@@ -77,7 +78,7 @@ class GameController extends BaseController
     }
 
     /** @throws Exception */
-    #[Route('/{gameId}/edit', name: 'edit', methods: 'PUT')]
+    #[Route('/{gameId}/edit', name: 'edit', methods: 'POST')]
     #[IsGranted(GameVoter::VIEW, subject: 'game', message: ObreatlasExceptions::CANT_VIEW_GAME)]
     #[IsGranted(GameVoter::GAME_MASTER, subject: 'game', message: ObreatlasExceptions::NOT_GAME_MASTER)]
     public function edit(
@@ -99,7 +100,8 @@ class GameController extends BaseController
             }
         }
 
-        $game->setTitle($gameDTO->title)
+        $game
+            ->setTitle($gameDTO->title)
             ->setSlug($gameDTO->slug)
             ->setStartedAt($gameDTO->startedAt)
             ->setClosed($gameDTO->closed);

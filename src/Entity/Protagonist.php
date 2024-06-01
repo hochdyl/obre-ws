@@ -4,6 +4,8 @@ namespace App\Entity;
 
 use App\Repository\ProtagonistRepository;
 use DateTimeImmutable;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
@@ -63,6 +65,14 @@ class Protagonist
 
     #[ORM\Column]
     private ?DateTimeImmutable $updatedAt = null;
+
+    #[ORM\OneToMany(targetEntity: ProtagonistMetric::class, mappedBy: 'protagonist', orphanRemoval: true)]
+    private Collection $metrics;
+
+    public function __construct()
+    {
+        $this->metrics = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -185,6 +195,36 @@ class Protagonist
     public function setUpdatedAt(DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, ProtagonistMetric>
+     */
+    public function getMetrics(): Collection
+    {
+        return $this->metrics;
+    }
+
+    public function addMetric(ProtagonistMetric $metric): static
+    {
+        if (!$this->metrics->contains($metric)) {
+            $this->metrics->add($metric);
+            $metric->setProtagonist($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMetric(ProtagonistMetric $metric): static
+    {
+        if ($this->metrics->removeElement($metric)) {
+            // set the owning side to null (unless already changed)
+            if ($metric->getProtagonist() === $this) {
+                $metric->setProtagonist(null);
+            }
+        }
 
         return $this;
     }

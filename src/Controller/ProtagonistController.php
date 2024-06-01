@@ -51,7 +51,8 @@ class ProtagonistController extends BaseController
 
         $user = $this->getUser();
 
-        $protagonist->setGame($game)
+        $protagonist
+            ->setGame($game)
             ->setCreator($user)
             ->setLevel(1);
 
@@ -127,7 +128,8 @@ class ProtagonistController extends BaseController
 
         $user = $this->getUser();
 
-        $protagonist->setName($protagonistDTO->name)
+        $protagonist
+            ->setName($protagonistDTO->name)
             ->setSlug($protagonistDTO->slug)
             ->setStory($protagonistDTO->story)
             ->setLevel($protagonistDTO->level);
@@ -158,7 +160,7 @@ class ProtagonistController extends BaseController
     {
         $matchedProtagonist = $protagonistRepository->findByGameAndSlug($game->getSlug(), $protagonistSlug);
         if (!$matchedProtagonist) {
-            throw new Exception(ObreatlasExceptions::PROTAGONIST_NOT_EXIST);
+            throw new Exception(ObreatlasExceptions::PROTAGONIST_NOT_FOUND);
         }
 
         $canViewProtagonist = $security->isGranted(ProtagonistVoter::VIEW, $matchedProtagonist);
@@ -167,7 +169,7 @@ class ProtagonistController extends BaseController
         }
 
         return self::response($matchedProtagonist, Response::HTTP_OK, [], [
-            'groups' => ['protagonist', 'protagonist.data', 'user', 'game']
+            'groups' => ['protagonist', 'protagonist.data', 'user', 'game', 'metric']
         ]);
     }
 }
