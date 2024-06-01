@@ -3,7 +3,10 @@
 namespace App\Entity;
 
 use App\Repository\ProtagonistMetricRepository;
+use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProtagonistMetricRepository::class)]
 class ProtagonistMetric
@@ -11,6 +14,7 @@ class ProtagonistMetric
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['metric'])]
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'metrics')]
@@ -19,19 +23,23 @@ class ProtagonistMetric
 
     #[ORM\ManyToOne(inversedBy: 'metricValues')]
     #[ORM\JoinColumn(nullable: false)]
+    #[Groups(['metric'])]
     private ?Metric $metric = null;
 
     #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Groups(['metric'])]
     private ?int $value = null;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['metric'])]
     private ?int $max = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    private ?DateTimeImmutable $createdAt = null;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $updatedAt = null;
+    private ?DateTimeImmutable $updatedAt = null;
 
     public function getId(): ?int
     {
@@ -86,24 +94,24 @@ class ProtagonistMetric
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    public function setCreatedAt(DateTimeImmutable $createdAt): static
     {
         $this->createdAt = $createdAt;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeImmutable
+    public function getUpdatedAt(): ?DateTimeImmutable
     {
         return $this->updatedAt;
     }
 
-    public function setUpdatedAt(\DateTimeImmutable $updatedAt): static
+    public function setUpdatedAt(DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
 

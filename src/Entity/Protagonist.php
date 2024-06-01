@@ -67,6 +67,7 @@ class Protagonist
     private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\OneToMany(targetEntity: ProtagonistMetric::class, mappedBy: 'protagonist', orphanRemoval: true)]
+    #[Groups(['protagonist.data'])]
     private Collection $metrics;
 
     public function __construct()
