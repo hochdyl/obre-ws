@@ -80,7 +80,7 @@ class MetricController extends BaseController
         }
 
         // Remove protagonist metrics that are not in list
-        $protagonistMetrics = $protagonist->getMetricValues();
+        $protagonistMetrics = $protagonist->getMetricsValues();
         foreach ($protagonistMetrics as $protagonistMetric) {
             if (!in_array($protagonistMetric->getId(), $savedProtagonistMetrics)) {
                 $em->remove($protagonistMetric);
