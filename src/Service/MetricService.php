@@ -20,6 +20,8 @@ readonly class MetricService
     {}
 
     /**
+     * Return a metric and a protagonistMetric (create a new object if needed)
+     *
      * @return array{metric: Metric, protagonistMetric: ProtagonistMetric}
      * @throws Exception
      */

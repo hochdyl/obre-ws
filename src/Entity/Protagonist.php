@@ -68,11 +68,11 @@ class Protagonist
 
     #[ORM\OneToMany(targetEntity: ProtagonistMetric::class, mappedBy: 'protagonist', orphanRemoval: true)]
     #[Groups(['protagonist.data'])]
-    private Collection $metrics;
+    private Collection $metricsValues;
 
     public function __construct()
     {
-        $this->metrics = new ArrayCollection();
+        $this->metricsValues = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,24 +203,24 @@ class Protagonist
     /**
      * @return Collection<int, ProtagonistMetric>
      */
-    public function getMetrics(): Collection
+    public function getMetricsValues(): Collection
     {
-        return $this->metrics;
+        return $this->metricsValues;
     }
 
-    public function addMetric(ProtagonistMetric $metric): static
+    public function addMetricsValues(ProtagonistMetric $metric): static
     {
-        if (!$this->metrics->contains($metric)) {
-            $this->metrics->add($metric);
+        if (!$this->metricsValues->contains($metric)) {
+            $this->metricsValues->add($metric);
             $metric->setProtagonist($this);
         }
 
         return $this;
     }
 
-    public function removeMetric(ProtagonistMetric $metric): static
+    public function removeMetricsValues(ProtagonistMetric $metric): static
     {
-        if ($this->metrics->removeElement($metric)) {
+        if ($this->metricsValues->removeElement($metric)) {
             // set the owning side to null (unless already changed)
             if ($metric->getProtagonist() === $this) {
                 $metric->setProtagonist(null);

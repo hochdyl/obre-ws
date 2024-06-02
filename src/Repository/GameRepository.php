@@ -29,10 +29,8 @@ class GameRepository extends ServiceEntityRepository
      * - Game is not closed
      * - Game is owned by user
      * - At least one of the game's protagonists is owned by user
-     *
-     * @return Game[] Returns an array of Game objects
      */
-    public function getGamesAvailableByUser(string $username): array
+    public function findAllAvailableByUser(string $username): array
     {
         return $this->createQueryBuilder('g')
             ->leftJoin('g.gameMaster', 'ggm')

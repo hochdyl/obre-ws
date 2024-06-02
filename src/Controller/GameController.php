@@ -25,7 +25,7 @@ class GameController extends BaseController
     {
         $user = $this->getUser();
 
-        $games = $gameRepository->getGamesAvailableByUser($user->getUserIdentifier());
+        $games = $gameRepository->findAllAvailableByUser($user->getUserIdentifier());
 
         return self::response($games, Response::HTTP_OK, [], [
             'groups' => ['game', 'user']

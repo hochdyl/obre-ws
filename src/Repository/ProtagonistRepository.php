@@ -22,9 +22,7 @@ class ProtagonistRepository extends ServiceEntityRepository
     }
 
     /**
-     * @param string $gameSlug
-     * @param string $protagonistSlug
-     * @return array|null Returns a Protagonist object or null
+     * Return a protagonist by slug and game slug
      */
     public function findByGameAndSlug(string $gameSlug, string $protagonistSlug): Protagonist | null
     {
