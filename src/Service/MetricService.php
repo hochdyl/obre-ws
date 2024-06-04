@@ -3,6 +3,7 @@
 namespace App\Service;
 
 use App\DTO\Metric\MetricDTO;
+use App\Entity\Game;
 use App\Entity\Metric;
 use App\Entity\Protagonist;
 use App\Entity\ProtagonistMetric;
@@ -28,12 +29,13 @@ readonly class MetricService
     function getData(MetricDTO $metricDTO, Protagonist $protagonist): array
     {
         $metricId = $metricDTO->id;
+        $game = $protagonist->getGame();
 
         // Existing metric
         if ($metricId) {
             $metric = $this->findMetric($metricId);
 
-            $this->updateMetric($metric, $metricDTO);
+            $this->updateMetric($metric, $metricDTO, $game);
 
             $protagonistMetric = $this->protagonistMetricRepository->findOneBy([
                 'protagonist' => $protagonist->getId(),
@@ -55,7 +57,7 @@ readonly class MetricService
 
         // Otherwise create everything
         $metric = new Metric();
-        $this->updateMetric($metric, $metricDTO);
+        $this->updateMetric($metric, $metricDTO, $game);
 
         $protagonistMetric = new ProtagonistMetric();
         $this->updateProtagonistMetric($protagonistMetric, $protagonist, $metric, $metricDTO);
@@ -88,10 +90,11 @@ readonly class MetricService
             ->setMax($metricDTO->max);
     }
 
-    private function updateMetric(Metric $metric, MetricDTO $metricDTO): void
+    private function updateMetric(Metric $metric, MetricDTO $metricDTO, Game $game): void
     {
         $metric
             ->setName($metricDTO->name)
-            ->setEmoji($metricDTO->emoji);
+            ->setEmoji($metricDTO->emoji)
+            ->setGame($game);
     }
 }

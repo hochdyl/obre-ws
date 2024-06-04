@@ -9,6 +9,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProtagonistMetricRepository::class)]
+#[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_METRIC', fields: ['protagonist', 'metric'])]
 class ProtagonistMetric
 {
     #[ORM\Id]

@@ -74,9 +74,13 @@ class Game
     #[ORM\Column]
     private ?DateTimeImmutable $updatedAt = null;
 
+    #[ORM\OneToMany(targetEntity: Metric::class, mappedBy: 'game', orphanRemoval: true)]
+    private Collection $metrics;
+
     public function __construct()
     {
         $this->protagonists = new ArrayCollection();
+        $this->metrics = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -233,6 +237,36 @@ class Game
     public function setUpdatedAt(DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Metric>
+     */
+    public function getMetrics(): Collection
+    {
+        return $this->metrics;
+    }
+
+    public function addMetric(Metric $metric): static
+    {
+        if (!$this->metrics->contains($metric)) {
+            $this->metrics->add($metric);
+            $metric->setGame($this);
+        }
+
+        return $this;
+    }
+
+    public function removeMetric(Metric $metric): static
+    {
+        if ($this->metrics->removeElement($metric)) {
+            // set the owning side to null (unless already changed)
+            if ($metric->getGame() === $this) {
+                $metric->setGame(null);
+            }
+        }
 
         return $this;
     }

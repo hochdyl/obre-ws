@@ -21,21 +21,6 @@ class MetricRepository extends ServiceEntityRepository
         parent::__construct($registry, Metric::class);
     }
 
-    /**
-     * Return all metrics not used by any protagonists
-     */
-    public function findAllByGame(int $gameId): array
-    {
-        return $this->createQueryBuilder('m')
-            ->join('m.metricValues', 'mmv')
-            ->join('mmv.protagonist', 'mmvp')
-            ->join('mmvp.game', 'mmvpg')
-            ->where('mmvpg.id = :gameId')
-            ->setParameter('gameId', $gameId)
-            ->getQuery()
-            ->getResult();
-    }
-
     //    /**
     //     * @return Metric[] Returns an array of Metric objects
     //     */

@@ -21,11 +21,11 @@ class Metric
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
-    #[Groups(['metric'])]
+    #[Groups(['metric', 'metric.create'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['metric'])]
+    #[Groups(['metric', 'metric.create'])]
     private ?string $emoji = null;
 
     #[ORM\Column]
@@ -36,6 +36,10 @@ class Metric
 
     #[ORM\OneToMany(targetEntity: ProtagonistMetric::class, mappedBy: 'metric', orphanRemoval: true)]
     private Collection $metricValues;
+
+    #[ORM\ManyToOne(inversedBy: 'metrics')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Game $game = null;
 
     public function __construct()
     {
@@ -121,6 +125,18 @@ class Metric
                 $protagonistMetric->setMetric(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getGame(): ?Game
+    {
+        return $this->game;
+    }
+
+    public function setGame(?Game $game): static
+    {
+        $this->game = $game;
 
         return $this;
     }

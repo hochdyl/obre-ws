@@ -4,7 +4,7 @@ namespace App\DTO\Metric;
 
 use Symfony\Component\Validator\Constraints as Assert;
 
-class EditMetricsDTO
+class EditMetricsValuesDTO
 {
     public function __construct(
 
@@ -12,6 +12,6 @@ class EditMetricsDTO
          * @var array<MetricDTO>
          */
         #[Assert\NotBlank]
-        public array $metrics,
+        public array $metricsValues,
     ) {}
 }
