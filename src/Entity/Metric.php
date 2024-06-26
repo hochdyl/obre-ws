@@ -34,8 +34,8 @@ class Metric
     #[ORM\Column]
     private ?DateTimeImmutable $updatedAt = null;
 
-    #[ORM\OneToMany(targetEntity: ProtagonistMetric::class, mappedBy: 'metric', orphanRemoval: true)]
-    private Collection $metricValues;
+    #[ORM\OneToMany(targetEntity: ProtagonistMetric::class, mappedBy: 'metricDetails', orphanRemoval: true)]
+    private Collection $protagonistMetrics;
 
     #[ORM\ManyToOne(inversedBy: 'metrics')]
     #[ORM\JoinColumn(nullable: false)]
@@ -43,7 +43,7 @@ class Metric
 
     public function __construct()
     {
-        $this->metricValues = new ArrayCollection();
+        $this->protagonistMetrics = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -102,16 +102,16 @@ class Metric
     /**
      * @return Collection<int, ProtagonistMetric>
      */
-    public function getProtagonistMetric(): Collection
+    public function getProtagonistMetrics(): Collection
     {
-        return $this->metricValues;
+        return $this->protagonistMetrics;
     }
 
     public function addProtagonistMetric(ProtagonistMetric $protagonistMetric): static
     {
-        if (!$this->metricValues->contains($protagonistMetric)) {
-            $this->metricValues->add($protagonistMetric);
-            $protagonistMetric->setMetric($this);
+        if (!$this->protagonistMetrics->contains($protagonistMetric)) {
+            $this->protagonistMetrics->add($protagonistMetric);
+            $protagonistMetric->setMetricDetails($this);
         }
 
         return $this;
@@ -119,10 +119,10 @@ class Metric
 
     public function removeProtagonistMetric(ProtagonistMetric $protagonistMetric): static
     {
-        if ($this->metricValues->removeElement($protagonistMetric)) {
+        if ($this->protagonistMetrics->removeElement($protagonistMetric)) {
             // set the owning side to null (unless already changed)
-            if ($protagonistMetric->getMetric() === $this) {
-                $protagonistMetric->setMetric(null);
+            if ($protagonistMetric->getMetricDetails() === $this) {
+                $protagonistMetric->setMetricDetails(null);
             }
         }
 

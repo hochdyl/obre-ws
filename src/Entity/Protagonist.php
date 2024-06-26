@@ -35,7 +35,6 @@ class Protagonist
 
     #[ORM\ManyToOne(inversedBy: 'protagonists')]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['protagonist.data'])]
     private ?Game $game = null;
 
     #[ORM\Column(type: Types::TEXT, nullable: true)]
@@ -43,7 +42,7 @@ class Protagonist
     private ?string $story = null;
 
     #[ORM\OneToOne(cascade: ['persist', 'remove'])]
-    #[Groups(['protagonist'])]
+    #[Groups(['protagonist', 'protagonist.create'])]
     private ?Upload $portrait = null;
 
     #[ORM\ManyToOne]
@@ -52,7 +51,6 @@ class Protagonist
 
     #[ORM\ManyToOne]
     #[ORM\JoinColumn(nullable: false)]
-    #[Groups(['protagonist.data'])]
     private ?User $creator = null;
 
     #[ORM\Column]
@@ -67,12 +65,12 @@ class Protagonist
     private ?DateTimeImmutable $updatedAt = null;
 
     #[ORM\OneToMany(targetEntity: ProtagonistMetric::class, mappedBy: 'protagonist', orphanRemoval: true)]
-    #[Groups(['protagonist.data'])]
-    private Collection $metricsValues;
+    #[Groups(['protagonist'])]
+    private Collection $metrics;
 
     public function __construct()
     {
-        $this->metricsValues = new ArrayCollection();
+        $this->metrics = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -203,24 +201,24 @@ class Protagonist
     /**
      * @return Collection<int, ProtagonistMetric>
      */
-    public function getMetricsValues(): Collection
+    public function getMetrics(): Collection
     {
-        return $this->metricsValues;
+        return $this->metrics;
     }
 
-    public function addMetricsValues(ProtagonistMetric $metric): static
+    public function addMetric(ProtagonistMetric $metric): static
     {
-        if (!$this->metricsValues->contains($metric)) {
-            $this->metricsValues->add($metric);
+        if (!$this->metrics->contains($metric)) {
+            $this->metrics->add($metric);
             $metric->setProtagonist($this);
         }
 
         return $this;
     }
 
-    public function removeMetricsValues(ProtagonistMetric $metric): static
+    public function removeMetric(ProtagonistMetric $metric): static
     {
-        if ($this->metricsValues->removeElement($metric)) {
+        if ($this->metrics->removeElement($metric)) {
             // set the owning side to null (unless already changed)
             if ($metric->getProtagonist() === $this) {
                 $metric->setProtagonist(null);

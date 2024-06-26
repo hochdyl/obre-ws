@@ -57,7 +57,7 @@ class Game
 
     #[ORM\OneToMany(targetEntity: Protagonist::class, mappedBy: 'game')]
     #[ORM\OrderBy(['id' => 'DESC'])]
-    #[Groups(['game.lobby'])]
+    #[Groups(['game.play'])]
     private Collection $protagonists;
 
     #[ORM\Column]

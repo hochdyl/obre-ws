@@ -20,4 +20,9 @@ readonly final class ObreatlasExceptions
 
     // Metric
     const METRIC_NOT_FOUND = 'This metric was not found';
+
+    // Upload
+    const NO_FILE = 'No file found in request';
+    const FILE_NOT_FOUND = 'This file was not found';
+
 }

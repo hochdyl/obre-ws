@@ -73,7 +73,7 @@ class GameController extends BaseController
         $game->filterProtagonistsAvailableByUser($user);
 
         return self::response($game, Response::HTTP_OK, [], [
-            'groups' => ['game', 'game.lobby', 'protagonist', 'user']
+            'groups' => ['game', 'game.play', 'protagonist', 'metric', 'user', 'upload']
         ]);
     }
 

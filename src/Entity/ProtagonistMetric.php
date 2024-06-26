@@ -22,10 +22,10 @@ class ProtagonistMetric
     #[ORM\JoinColumn(nullable: false)]
     private ?Protagonist $protagonist = null;
 
-    #[ORM\ManyToOne(inversedBy: 'metricValues')]
+    #[ORM\ManyToOne(inversedBy: 'protagonistMetrics')]
     #[ORM\JoinColumn(nullable: false)]
     #[Groups(['metric'])]
-    private ?Metric $metric = null;
+    private ?Metric $metricDetails = null;
 
     #[ORM\Column]
     #[Assert\NotBlank]
@@ -59,14 +59,14 @@ class ProtagonistMetric
         return $this;
     }
 
-    public function getMetric(): ?Metric
+    public function getMetricDetails(): ?Metric
     {
-        return $this->metric;
+        return $this->metricDetails;
     }
 
-    public function setMetric(?Metric $metric): static
+    public function setMetricDetails(?Metric $metric): static
     {
-        $this->metric = $metric;
+        $this->metricDetails = $metric;
 
         return $this;
     }

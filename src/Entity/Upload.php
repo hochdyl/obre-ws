@@ -8,6 +8,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 #[Vich\Uploadable]
@@ -28,7 +29,8 @@ class Upload
     private ?File $file = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['protagonist'])]
+    #[Assert\NotBlank]
+    #[Groups(['upload'])]
     private ?string $fileName = null;
 
     #[ORM\Column]
