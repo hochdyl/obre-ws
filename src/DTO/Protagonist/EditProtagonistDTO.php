@@ -2,6 +2,7 @@
 
 namespace App\DTO\Protagonist;
 
+use App\Entity\Upload;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class EditProtagonistDTO
@@ -13,9 +14,12 @@ class EditProtagonistDTO
         #[Assert\NotBlank]
         public string $slug,
 
+        public string | null $story,
+
         #[Assert\GreaterThanOrEqual(1)]
         public int $level,
 
-        public ?string $story = null
+        #[Assert\NotBlank]
+        public Upload $portrait
     ) {}
 }

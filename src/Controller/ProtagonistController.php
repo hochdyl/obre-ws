@@ -17,7 +17,6 @@ use Exception;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Attribute\MapRequestPayload;
 use Symfony\Component\Routing\Attribute\Route;
@@ -110,9 +109,9 @@ class ProtagonistController extends BaseController
         #[MapRequestPayload]
         EditProtagonistDTO     $protagonistDTO,
         ProtagonistRepository  $protagonistRepository,
+        UploadRepository       $uploadRepository,
         Security               $security,
-        EntityManagerInterface $em,
-        Request                $request,
+        EntityManagerInterface $em
     ): JsonResponse
     {
         SluggerService::validateSlug($protagonistDTO->name, $protagonistDTO->slug);
@@ -130,19 +129,20 @@ class ProtagonistController extends BaseController
             }
         }
 
-        $user = $this->getUser();
+        $portrait = null;
+        if ($protagonistDTO->portrait->getFileName()) {
+            $portrait = $uploadRepository->findOneBy(['fileName' => $protagonistDTO->portrait->getFileName()]);
+            if (!$portrait) {
+                throw new Exception(ObreatlasExceptions::FILE_NOT_FOUND);
+            }
+        }
 
         $protagonist
             ->setName($protagonistDTO->name)
             ->setSlug($protagonistDTO->slug)
             ->setStory($protagonistDTO->story)
-            ->setLevel($protagonistDTO->level);
-
-        $portrait = $request->files->get('portrait');
-        if ($portrait) {
-            $upload = UploaderService::upload($portrait, $user);
-            $protagonist->setPortrait($upload);
-        }
+            ->setLevel($protagonistDTO->level)
+            ->setPortrait($portrait);
 
         $em->flush();
 
