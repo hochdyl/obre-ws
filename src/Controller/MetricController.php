@@ -2,7 +2,8 @@
 
 namespace App\Controller;
 
-use App\DTO\Metric\EditMetricsValuesDTO;
+use App\DTO\Metric\EditMetricDTO;
+use App\DTO\Metric\AssignMetricsDTO;
 use App\Entity\Game;
 use App\Entity\Metric;
 use App\Entity\Protagonist;
@@ -43,13 +44,13 @@ class MetricController extends BaseController
     #[IsGranted(GameVoter::GAME_MASTER, subject: 'game', message: ObreatlasExceptions::NOT_GAME_MASTER)]
     public function create(
         #[MapEntity(mapping: ['gameSlug' => 'slug'])]
-        Game $game,
+        Game                   $game,
         #[MapRequestPayload(
             serializationContext: [
                 'groups' => ['metric.create']
             ]
         )]
-        Metric $metric,
+        Metric                 $metric,
         EntityManagerInterface $em
     ): JsonResponse
     {
@@ -64,13 +65,40 @@ class MetricController extends BaseController
     }
 
     /** @throws Exception */
-    #[Route('/{protagonistId}/editAll', name: 'editAll', methods: 'POST')]
-    #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: ObreatlasExceptions::CANT_VIEW_PROTAGONIST)]
+    #[Route('/{metricId}/edit', name: 'edit', methods: 'POST')]
     public function edit(
+        #[MapEntity(mapping: ['metricId' => 'id'])]
+        Metric                 $metric,
+        #[MapRequestPayload]
+        EditMetricDTO          $metricDTO,
+        Security               $security,
+        EntityManagerInterface $em
+    ): JsonResponse
+    {
+        $isGameMaster = $security->isGranted(GameVoter::GAME_MASTER, $metric->getGame());
+        if (!$isGameMaster) {
+            throw new Exception(ObreatlasExceptions::NOT_GAME_MASTER);
+        }
+
+        $metric
+            ->setName($metricDTO->name)
+            ->setEmoji($metricDTO->emoji);
+
+        $em->flush();
+
+        return self::response($metric, Response::HTTP_OK, [], [
+            'groups' => ['metric']
+        ]);
+    }
+
+    /** @throws Exception */
+    #[Route('/{protagonistId}/assign', name: 'assign', methods: 'POST')]
+    #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: ObreatlasExceptions::CANT_VIEW_PROTAGONIST)]
+    public function assign(
         #[MapEntity(mapping: ['protagonistId' => 'id'])]
         Protagonist            $protagonist,
         #[MapRequestPayload]
-        EditMetricsValuesDTO   $metricsValuesDTO,
+        AssignMetricsDTO       $assignMetricsDTO,
         Security               $security,
         MetricService          $metricService,
         EntityManagerInterface $em,
@@ -84,7 +112,7 @@ class MetricController extends BaseController
         // List of protagonist metrics id to save
         $savedProtagonistMetrics = [];
 
-        foreach ($metricsValuesDTO->metricsValues as $metricDTO) {
+        foreach ($assignMetricsDTO->metricsValues as $metricDTO) {
             $data = $metricService->getData($metricDTO, $protagonist);
 
             $metric = $data['metric'];

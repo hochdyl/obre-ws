@@ -5,7 +5,7 @@ namespace App\DTO\Metric;
 use App\Entity\Metric;
 use Symfony\Component\Validator\Constraints as Assert;
 
-class MetricDTO
+class MetricValueDTO
 {
     public function __construct(
         public int | null $id,
