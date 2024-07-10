@@ -2,7 +2,7 @@
 
 namespace App\Service;
 
-use App\DTO\Metric\MetricValueDTO;
+use App\DTO\Metric\AssignProtagonistMetricDTO;
 use App\Entity\Game;
 use App\Entity\Metric;
 use App\Entity\Protagonist;
@@ -26,7 +26,7 @@ readonly class MetricService
      * @return array{metric: Metric, protagonistMetric: ProtagonistMetric}
      * @throws Exception
      */
-    function getData(MetricValueDTO $metricDTO, Protagonist $protagonist): array
+    function getData(AssignProtagonistMetricDTO $metricDTO, Protagonist $protagonist): array
     {
         $metricId = $metricDTO->id;
         $game = $protagonist->getGame();
@@ -80,7 +80,7 @@ readonly class MetricService
         ProtagonistMetric $protagonistMetric,
         Protagonist $protagonist,
         Metric $metric,
-        MetricValueDTO $metricDTO
+        AssignProtagonistMetricDTO $metricDTO
     ): void
     {
         $protagonistMetric
@@ -90,7 +90,7 @@ readonly class MetricService
             ->setMax($metricDTO->max);
     }
 
-    private function updateMetric(Metric $metric, MetricValueDTO $metricDTO, Game $game): void
+    private function updateMetric(Metric $metric, AssignProtagonistMetricDTO $metricDTO, Game $game): void
     {
         $metric
             ->setName($metricDTO->name)

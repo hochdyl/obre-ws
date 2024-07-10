@@ -7,7 +7,10 @@ use App\DTO\Metric\AssignMetricsDTO;
 use App\Entity\Game;
 use App\Entity\Metric;
 use App\Entity\Protagonist;
+use App\Entity\ProtagonistMetric;
 use App\Exceptions\ObreatlasExceptions;
+use App\Repository\MetricRepository;
+use App\Repository\ProtagonistMetricRepository;
 use App\Security\Voter\GameVoter;
 use App\Security\Voter\ProtagonistVoter;
 use App\Service\MetricService;
@@ -99,8 +102,9 @@ class MetricController extends BaseController
         Protagonist            $protagonist,
         #[MapRequestPayload]
         AssignMetricsDTO       $assignMetricsDTO,
+        MetricRepository $metricRepository,
+        ProtagonistMetricRepository $protagonistMetricRepository,
         Security               $security,
-        MetricService          $metricService,
         EntityManagerInterface $em,
     ): JsonResponse
     {
@@ -109,33 +113,41 @@ class MetricController extends BaseController
             throw new Exception(ObreatlasExceptions::NOT_GAME_MASTER);
         }
 
-        // List of protagonist metrics id to save
-        $savedProtagonistMetrics = [];
+        $protagonist->removeAllMetrics();
 
-        foreach ($assignMetricsDTO->metricsValues as $metricDTO) {
-            $data = $metricService->getData($metricDTO, $protagonist);
+        foreach ($assignMetricsDTO->metrics as $metricDTO) {
+            $metric = $metricRepository->find($metricDTO->metricDetails->id);
 
-            $metric = $data['metric'];
-            $protagonistMetric = $data['protagonistMetric'];
-
-            $savedProtagonistMetrics[] = $protagonistMetric->getId();
-
-            $em->persist($metric);
-            $em->persist($protagonistMetric);
-        }
-
-        // Remove protagonist metrics that are not in list
-        $protagonistMetrics = $protagonist->getMetricsValues();
-        foreach ($protagonistMetrics as $protagonistMetric) {
-            if (!in_array($protagonistMetric->getId(), $savedProtagonistMetrics)) {
-                $em->remove($protagonistMetric);
+            if (!$metric) {
+                throw new Exception(ObreatlasExceptions::METRIC_NOT_FOUND);
             }
+
+            if ($metricDTO->id) {
+                $protagonistMetric = $protagonistMetricRepository->find($metricDTO->id);
+
+                if (!$protagonistMetric) {
+                    throw new Exception(ObreatlasExceptions::PROTAGONIST_METRIC_NOT_FOUND);
+                }
+            } else {
+                $protagonistMetric = new ProtagonistMetric();
+            }
+
+            $protagonistMetric
+                ->setMetricDetails($metric)
+                ->setValue($metricDTO->value)
+                ->setMax($metricDTO->max);
+
+            $em->persist($protagonistMetric);
+
+            $protagonist->addMetric($protagonistMetric);
         }
+
+        $em->persist($protagonist);
 
         $em->flush();
 
         return self::response($protagonist, Response::HTTP_OK, [], [
-            'groups' => ['protagonist', 'user']
+            'groups' => ['protagonist', 'user', 'metric']
         ]);
     }
 }

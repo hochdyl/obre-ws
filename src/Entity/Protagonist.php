@@ -227,4 +227,13 @@ class Protagonist
 
         return $this;
     }
+
+    public function removeAllMetrics(): static
+    {
+        foreach ($this->metrics as $metric) {
+            $this->removeMetric($metric);
+        }
+
+        return $this;
+    }
 }
