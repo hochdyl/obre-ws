@@ -2,8 +2,8 @@
 
 namespace App\Controller;
 
-use App\DTO\Metric\EditMetricDTO;
 use App\DTO\Metric\AssignMetricsDTO;
+use App\DTO\Metric\EditMetricDTO;
 use App\Entity\Game;
 use App\Entity\Metric;
 use App\Entity\Protagonist;
@@ -13,7 +13,6 @@ use App\Repository\MetricRepository;
 use App\Repository\ProtagonistMetricRepository;
 use App\Security\Voter\GameVoter;
 use App\Security\Voter\ProtagonistVoter;
-use App\Service\MetricService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -99,13 +98,13 @@ class MetricController extends BaseController
     #[IsGranted(ProtagonistVoter::VIEW, subject: 'protagonist', message: ObreatlasExceptions::CANT_VIEW_PROTAGONIST)]
     public function assign(
         #[MapEntity(mapping: ['protagonistId' => 'id'])]
-        Protagonist            $protagonist,
+        Protagonist                 $protagonist,
         #[MapRequestPayload]
-        AssignMetricsDTO       $assignMetricsDTO,
-        MetricRepository $metricRepository,
+        AssignMetricsDTO            $assignMetricsDTO,
+        MetricRepository            $metricRepository,
         ProtagonistMetricRepository $protagonistMetricRepository,
-        Security               $security,
-        EntityManagerInterface $em,
+        Security                    $security,
+        EntityManagerInterface      $em,
     ): JsonResponse
     {
         $isGameMaster = $security->isGranted(GameVoter::GAME_MASTER, $protagonist->getGame());
