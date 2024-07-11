@@ -17,6 +17,6 @@ class EditGameDTO
         #[Assert\NotBlank]
         public ?DateTimeImmutable $startedAt = new DateTimeImmutable(),
 
-        public ?bool $closed = false
+        public ?bool $closed = false,
     ) {}
 }

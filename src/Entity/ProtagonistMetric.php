@@ -5,7 +5,6 @@ namespace App\Entity;
 use App\Repository\ProtagonistMetricRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Serializer\Attribute\Groups;
 
 #[ORM\Entity(repositoryClass: ProtagonistMetricRepository::class)]
@@ -27,8 +26,7 @@ class ProtagonistMetric
     #[Groups(['metric'])]
     private ?Metric $metricDetails = null;
 
-    #[ORM\Column]
-    #[Assert\NotBlank]
+    #[ORM\Column(nullable: true)]
     #[Groups(['metric'])]
     private ?int $value = null;
 
@@ -76,7 +74,7 @@ class ProtagonistMetric
         return $this->value;
     }
 
-    public function setValue(int $value): static
+    public function setValue(?int $value): static
     {
         $this->value = $value;
 

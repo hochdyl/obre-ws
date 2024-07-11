@@ -10,8 +10,7 @@ class AssignProtagonistMetricDTO
     public function __construct(
         public int | null $id,
 
-        #[Assert\NotBlank]
-        public int $value,
+        public int | null $value,
 
         public int | null $max,
 
