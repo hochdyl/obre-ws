@@ -28,7 +28,7 @@ final class ExceptionListener
         $code = $exceptionCode >= 300 && $exceptionCode < 600 ? $exception->getCode() : 500;
         $status = 'error';
         $type = 'message';
-        $value = $exception->getMessage();
+        $value = 'An error occurred in our servers';
 
         // The file where the exception was thrown
         $filename = pathinfo($exception->getFile())['filename'];
