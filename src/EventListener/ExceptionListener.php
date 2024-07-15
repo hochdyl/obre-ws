@@ -8,6 +8,7 @@ use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
 
@@ -50,6 +51,12 @@ final class ExceptionListener
 
         // Check if exception come from EntityValueResolver
         if ($filename === pathinfo(EntityValueResolver::class)['filename']) {
+            preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
+            $code = 404;
+            $value = "$matches[0] not found";
+        }
+
+        if ($filename === pathinfo(NotFoundHttpException::class)['filename']) {
             preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
             $code = 404;
             $value = "$matches[0] not found";
