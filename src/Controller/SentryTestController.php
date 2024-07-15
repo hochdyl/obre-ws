@@ -17,9 +17,7 @@ class SentryTestController extends AbstractController {
         $this->logger = $logger;
     }
 
-    /**
-     * @Route(name="sentry_test", path="/_sentry-test")
-     */
+    #[Route('_sentry-test', name: 'sentry_test')]
     public function testLog()
     {
         // the following code will test if monolog integration logs to sentry
