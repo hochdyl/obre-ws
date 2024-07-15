@@ -64,9 +64,6 @@ class Game
     #[ORM\OneToMany(targetEntity: Metric::class, mappedBy: 'game', orphanRemoval: true)]
     private Collection $metrics;
 
-    #[ORM\Column(length: 255)]
-    private ?string $test = null;
-
     public function __construct()
     {
         $this->protagonists = new ArrayCollection();
@@ -257,18 +254,6 @@ class Game
                 $metric->setGame(null);
             }
         }
-
-        return $this;
-    }
-
-    public function getTest(): ?string
-    {
-        return $this->test;
-    }
-
-    public function setTest(string $test): static
-    {
-        $this->test = $test;
 
         return $this;
     }
