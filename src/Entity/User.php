@@ -49,7 +49,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Groups(['user.authenticate'])]
     private ?string $sessionToken = null;
 
-    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'owner')]
+    #[ORM\OneToMany(targetEntity: Game::class, mappedBy: 'gameMaster')]
     private Collection $games;
 
     #[ORM\Column]
