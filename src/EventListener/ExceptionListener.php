@@ -33,10 +33,15 @@ final class ExceptionListener
         // The file where the exception was thrown
         $filename = pathinfo($exception->getFile())['filename'];
 
-        // Check if exception come from RequestPayloadValueResolver
-        if ($filename === pathinfo(RequestPayloadValueResolver::class)['filename']) {
+        if ($exception instanceof NotFoundHttpException) {
+            preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
+            $code = 404;
+            $value = "$matches[0] not found";
+        }
+
+        else if ($filename === pathinfo(RequestPayloadValueResolver::class)['filename']) {
             $code = 400;
-            $value = 'Request body is missing or improperly formatted';
+            $value = $exception->getMessage();
 
             // Check if exception come from ValidationFailedException
             $previousException = $exception->getPrevious();
@@ -47,19 +52,6 @@ final class ExceptionListener
                 $type = 'data';
                 $value = ValidationService::getViolations($violations);
             }
-        }
-
-        // Check if exception come from EntityValueResolver
-        if ($filename === pathinfo(EntityValueResolver::class)['filename']) {
-            preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
-            $code = 404;
-            $value = "$matches[0] not found";
-        }
-
-        if ($filename === pathinfo(NotFoundHttpException::class)['filename']) {
-            preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
-            $code = 404;
-            $value = "$matches[0] not found";
         }
 
         $response = new JsonResponse([
