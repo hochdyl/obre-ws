@@ -32,7 +32,7 @@ final class ExceptionListener
             $resourceName = $matches[0] ?? "Resource";
             $response->setData([
                 'status' => 'error',
-                'code' => "$resourceName not found",
+                'message' => "$resourceName not found",
             ]);
             $response->setStatusCode(Response::HTTP_NOT_FOUND);
 
@@ -67,7 +67,7 @@ final class ExceptionListener
         $code = $exceptionCode >= 300 && $exceptionCode < 600 ? $exception->getCode() : 500;
         $response->setData([
             'status' => 'error',
-            'message' => 'An error occurred in our servers'
+            'message' => $exception->getMessage()
         ]);
         $response->setStatusCode($code);
 
