@@ -3,9 +3,9 @@
 namespace App\EventListener;
 
 use App\Service\ValidationService;
-use Symfony\Bridge\Doctrine\ArgumentResolver\EntityValueResolver;
 use Symfony\Component\EventDispatcher\Attribute\AsEventListener;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
@@ -25,39 +25,51 @@ final class ExceptionListener
         $exception = $event->getThrowable();
         $exceptionCode = $exception->getCode();
 
-        $code = $exceptionCode >= 300 && $exceptionCode < 600 ? $exception->getCode() : 500;
-        $status = 'error';
-        $type = 'message';
-        $value = 'An error occurred in our servers';
-
-        // The file where the exception was thrown
-        $filename = pathinfo($exception->getFile())['filename'];
+        $response = new JsonResponse();
 
         if ($exception instanceof NotFoundHttpException) {
             preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
-            $code = 404;
-            $value = "$matches[0] not found";
+            $resourceName = $matches[0] ?? "Resource";
+            $response->setData([
+                'status' => 'error',
+                'code' => "$resourceName not found",
+            ]);
+            $response->setStatusCode(Response::HTTP_NOT_FOUND);
+
+            $event->setResponse($response);
+            return;
         }
 
-        else if ($filename === pathinfo(RequestPayloadValueResolver::class)['filename']) {
-            $code = 400;
-            $value = $exception->getMessage();
+        // The file where the exception was thrown
+        $filename = pathinfo($exception->getFile())['filename'];
+        if ($filename === pathinfo(RequestPayloadValueResolver::class)['filename']) {
+            $response->setData([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+            $response->setStatusCode(Response::HTTP_BAD_REQUEST);
 
             // Check if exception come from ValidationFailedException
             $previousException = $exception->getPrevious();
             if ($previousException instanceof ValidationFailedException) {
                 $violations = $previousException->getViolations();
 
-                $status = 'fail';
-                $type = 'data';
-                $value = ValidationService::getViolations($violations);
+                $response->setData([
+                    'status' => 'fail',
+                    'data' => ValidationService::getViolations($violations)
+                ]);
             }
+
+            $event->setResponse($response);
+            return;
         }
 
-        $response = new JsonResponse([
-            'status' => $status,
-            $type => $value
-        ], $code);
+        $code = $exceptionCode >= 300 && $exceptionCode < 600 ? $exception->getCode() : 500;
+        $response->setData([
+            'status' => 'error',
+            'message' => 'An error occurred in our servers'
+        ]);
+        $response->setStatusCode($code);
 
         $event->setResponse($response);
     }
