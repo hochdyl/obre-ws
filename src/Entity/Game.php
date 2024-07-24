@@ -10,6 +10,7 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Regex;
 
 #[ORM\Entity(repositoryClass: GameRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_SLUG', fields: ['slug'])]
@@ -39,6 +40,11 @@ class Game
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Regex(
+        pattern: '/^[a-zA-Z0-9\- ]+$/',
+        message: 'Slug is invalid',
+        match: true
+    )]
     #[Groups(['game', 'game.create'])]
     private ?string $slug = null;
 

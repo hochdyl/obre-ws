@@ -19,6 +19,10 @@ class Upload
     #[ORM\Column]
     private ?int $id = null;
 
+    #[Assert\File(
+        maxSize: "2M",
+        mimeTypes: ["image/jpeg", "image/png", "image/gif"],
+    )]
     #[Vich\UploadableField(
         mapping: 'uploads',
         fileNameProperty: 'fileName',
@@ -29,7 +33,6 @@ class Upload
     private ?File $file = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank]
     #[Groups(['upload'])]
     private ?string $fileName = null;
 

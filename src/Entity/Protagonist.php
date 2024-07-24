@@ -10,6 +10,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
 use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints\Regex;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ProtagonistRepository::class)]
@@ -30,6 +31,11 @@ class Protagonist
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Regex(
+        pattern: '/^[a-zA-Z0-9\- ]+$/',
+        message: 'Slug is invalid',
+        match: true
+    )]
     #[Groups(['protagonist', 'protagonist.create'])]
     private ?string $slug = null;
 

@@ -20,8 +20,13 @@ abstract class BaseController extends AbstractController
         array $context = []
     ): JsonResponse
     {
+        $statusName = "success";
+        if ($status < 200 || $status >= 300) {
+            $statusName = gettype($data) === "string" ? "error" : "fail";
+        }
+
         return $this->json([
-            'status' => 'success',
+            'status' => $statusName,
             'data' => $data
         ], $status, $headers, $context);
     }
