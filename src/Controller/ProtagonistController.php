@@ -12,6 +12,7 @@ use App\Security\Voter\GameVoter;
 use App\Security\Voter\ProtagonistVoter;
 use App\Service\SluggerService;
 use App\Service\UploaderService;
+use App\Service\VoterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -80,14 +81,11 @@ class ProtagonistController extends BaseController
     public function choose(
         #[MapEntity(mapping: ['protagonistId' => 'id'])]
         Protagonist            $protagonist,
-        Security               $security,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        VoterService $voterService
     ): JsonResponse
     {
-        $canViewGame = $security->isGranted(GameVoter::VIEW, $protagonist->getGame());
-        if (!$canViewGame) {
-            throw new Exception(ObreatlasExceptions::CANT_VIEW_GAME);
-        }
+        $voterService->canViewGame($protagonist->getGame());
 
         $user = $this->getUser();
 
@@ -110,16 +108,13 @@ class ProtagonistController extends BaseController
         EditProtagonistDTO     $protagonistDTO,
         ProtagonistRepository  $protagonistRepository,
         UploadRepository       $uploadRepository,
-        Security               $security,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        VoterService $voterService
     ): JsonResponse
     {
         SluggerService::validateSlug($protagonistDTO->name, $protagonistDTO->slug);
 
-        $isGameMaster = $security->isGranted(GameVoter::GAME_MASTER, $protagonist->getGame());
-        if (!$isGameMaster) {
-            throw new Exception(ObreatlasExceptions::NOT_GAME_MASTER);
-        }
+        $voterService->isGameMaster($protagonist->getGame());
 
         // Protagonist name update
         if ($protagonistDTO->slug !== $protagonist->getSlug()) {

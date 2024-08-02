@@ -14,6 +14,7 @@ use App\Repository\MetricRepository;
 use App\Repository\ProtagonistMetricRepository;
 use App\Security\Voter\GameVoter;
 use App\Security\Voter\ProtagonistVoter;
+use App\Service\VoterService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
@@ -74,14 +75,11 @@ class MetricController extends BaseController
         Metric                 $metric,
         #[MapRequestPayload]
         EditMetricDTO          $metricDTO,
-        Security               $security,
-        EntityManagerInterface $em
+        EntityManagerInterface $em,
+        VoterService $voterService
     ): JsonResponse
     {
-        $isGameMaster = $security->isGranted(GameVoter::GAME_MASTER, $metric->getGame());
-        if (!$isGameMaster) {
-            throw new Exception(ObreatlasExceptions::NOT_GAME_MASTER);
-        }
+        $voterService->isGameMaster($metric->getGame());
 
         $metric
             ->setName($metricDTO->name)
@@ -104,14 +102,11 @@ class MetricController extends BaseController
         AssignMetricsDTO            $assignMetricsDTO,
         MetricRepository            $metricRepository,
         ProtagonistMetricRepository $protagonistMetricRepository,
-        Security                    $security,
         EntityManagerInterface      $em,
+        VoterService $voterService
     ): JsonResponse
     {
-        $isGameMaster = $security->isGranted(GameVoter::GAME_MASTER, $protagonist->getGame());
-        if (!$isGameMaster) {
-            throw new Exception(ObreatlasExceptions::NOT_GAME_MASTER);
-        }
+        $voterService->isGameMaster($protagonist->getGame());
 
         $protagonist->removeAllMetrics();
 

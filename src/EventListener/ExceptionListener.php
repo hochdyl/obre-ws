@@ -8,6 +8,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Controller\ArgumentResolver\RequestPayloadValueResolver;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\Validator\Exception\ValidationFailedException;
@@ -27,12 +28,23 @@ final class ExceptionListener
 
         $response = new JsonResponse();
 
+        if ($exception instanceof AccessDeniedHttpException) {
+            $response->setData([
+                'status' => 'error',
+                'message' => $exception->getMessage()
+            ]);
+            $response->setStatusCode(Response::HTTP_FORBIDDEN);
+
+            $event->setResponse($response);
+            return;
+        }
+
         if ($exception instanceof NotFoundHttpException) {
             preg_match('/[^\\\\"]+(?=" object)/', $exception->getMessage(), $matches);
             $resourceName = $matches[0] ?? "Resource";
             $response->setData([
                 'status' => 'error',
-                'code' => "$resourceName not found",
+                'message' => "$resourceName not found",
             ]);
             $response->setStatusCode(Response::HTTP_NOT_FOUND);
 

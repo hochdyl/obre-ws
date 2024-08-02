@@ -6,7 +6,7 @@ use App\Entity\Game;
 use App\Exceptions\ObreatlasExceptions;
 use App\Security\Voter\GameVoter;
 use Symfony\Bundle\SecurityBundle\Security;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
 readonly class VoterService
 {
@@ -18,18 +18,36 @@ readonly class VoterService
     }
 
     /**
-     * Check if the current user is the game master for the given game
+     * Check if the current user is the game master
      *
      * @param Game $game
      * @return bool
-     * @throws AccessDeniedException if the user is not the game master
+     * @throws AccessDeniedHttpException
      */
     public function isGameMaster(Game $game): bool
     {
         $isGameMaster = $this->security->isGranted(GameVoter::GAME_MASTER, $game);
 
         if (!$isGameMaster) {
-            throw new AccessDeniedException(ObreatlasExceptions::NOT_GAME_MASTER);
+            throw new AccessDeniedHttpException(ObreatlasExceptions::NOT_GAME_MASTER);
+        }
+
+        return true;
+    }
+
+    /**
+     * Check if the current user can view the game
+     *
+     * @param Game $game
+     * @return bool
+     * @throws AccessDeniedHttpException
+     */
+    public function canViewGame(Game $game): bool
+    {
+        $canViewGame = $this->security->isGranted(GameVoter::GAME_MASTER, $game);
+
+        if (!$canViewGame) {
+            throw new AccessDeniedHttpException(ObreatlasExceptions::CANT_VIEW_GAME);
         }
 
         return true;
