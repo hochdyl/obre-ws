@@ -23,6 +23,7 @@ readonly final class ObreatlasExceptions
 
     // Protagonist metric
     const PROTAGONIST_METRIC_NOT_FOUND = 'This protagonist metric was not found';
+    const UNAUTHORIZED_PERCENTAGE_MAX_VALUE = 'Percentage unit type cannot have a max value';
 
     // Upload
     const NO_FILE = 'No file found in request';

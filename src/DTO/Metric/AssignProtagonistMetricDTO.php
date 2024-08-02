@@ -2,7 +2,7 @@
 
 namespace App\DTO\Metric;
 
-use App\Entity\Metric;
+use App\Enums\UnitTypeEnum;
 use Symfony\Component\Validator\Constraints as Assert;
 
 class AssignProtagonistMetricDTO
@@ -15,6 +15,9 @@ class AssignProtagonistMetricDTO
         public int | null $max,
 
         #[Assert\NotBlank]
-        public AssignMetricDTO $metricDetails
+        public AssignMetricDTO $metricDetails,
+
+        #[Assert\NotBlank]
+        public UnitTypeEnum $unitType
     ) {}
 }

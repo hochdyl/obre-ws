@@ -8,6 +8,7 @@ use App\Entity\Game;
 use App\Entity\Metric;
 use App\Entity\Protagonist;
 use App\Entity\ProtagonistMetric;
+use App\Enums\UnitTypeEnum;
 use App\Exceptions\ObreatlasExceptions;
 use App\Repository\MetricRepository;
 use App\Repository\ProtagonistMetricRepository;
@@ -131,10 +132,15 @@ class MetricController extends BaseController
                 $protagonistMetric = new ProtagonistMetric();
             }
 
+            if ($metricDTO->unitType === UnitTypeEnum::Percentage && $metricDTO->max) {
+                throw new Exception(ObreatlasExceptions::UNAUTHORIZED_PERCENTAGE_MAX_VALUE);
+            }
+
             $protagonistMetric
                 ->setMetricDetails($metric)
                 ->setValue($metricDTO->value)
-                ->setMax($metricDTO->max);
+                ->setMax($metricDTO->max)
+                ->setUnitType($metricDTO->unitType);
 
             $em->persist($protagonistMetric);
 

@@ -2,10 +2,12 @@
 
 namespace App\Entity;
 
+use App\Enums\UnitTypeEnum;
 use App\Repository\ProtagonistMetricRepository;
 use DateTimeImmutable;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Serializer\Attribute\Groups;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ProtagonistMetricRepository::class)]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_METRIC', fields: ['protagonist', 'metricDetails'])]
@@ -39,6 +41,11 @@ class ProtagonistMetric
 
     #[ORM\Column]
     private ?DateTimeImmutable $updatedAt = null;
+
+    #[ORM\Column]
+    #[Assert\NotBlank]
+    #[Groups(['metric'])]
+    private ?UnitTypeEnum $unitType = null;
 
     public function getId(): ?int
     {
@@ -113,6 +120,18 @@ class ProtagonistMetric
     public function setUpdatedAt(DateTimeImmutable $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    public function getUnitType(): ?UnitTypeEnum
+    {
+        return $this->unitType;
+    }
+
+    public function setUnitType(UnitTypeEnum $unitType): static
+    {
+        $this->unitType = $unitType;
 
         return $this;
     }
