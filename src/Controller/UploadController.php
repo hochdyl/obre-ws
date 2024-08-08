@@ -4,7 +4,6 @@ namespace App\Controller;
 
 use App\Entity\Upload;
 use App\Exceptions\ObreatlasExceptions;
-use App\Service\UploaderService;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Symfony\Component\HttpFoundation\JsonResponse;
