@@ -25,6 +25,7 @@ class Protagonist
 
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank]
+    #[Assert\Length(max: 30, maxMessage: 'Maximum name size is {{ limit }} characters')]
     #[Groups(['protagonist', 'protagonist.create'])]
     private ?string $name = null;
 
@@ -54,7 +55,7 @@ class Protagonist
     private ?User $creator = null;
 
     #[ORM\Column]
-    #[Assert\GreaterThanOrEqual(1)]
+    #[Assert\Range(notInRangeMessage: 'Level must be between {{ min }} and {{ max }}', min: 1, max: 9999)]
     #[Groups(['protagonist'])]
     private ?int $level = null;
 
